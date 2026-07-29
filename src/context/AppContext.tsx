@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { User, SessionLog, MassageRequest } from '../types';
 import { DailyBalance, getLocalDateString, calculateNewDayBalance } from '../utils/timeEngine';
 import { supabase } from '../lib/supabase';
@@ -67,6 +67,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(() => {
     return typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted';
   });
+
+  const previousCountRef = useRef<number>(requests.length);
 
   const requestNotificationPermission = async () => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -146,7 +148,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
-  // 🔔 REALTIME SUPABASE SYNC ACROSS DEVICES WITH PUSH NOTIFICATIONS
+  // 🔔 REALTIME SUPABASE SYNC + 3s SMART POLLING FOR MAXIMUM MOBILE RELIABILITY
   useEffect(() => {
     if (!currentUser) return;
 
@@ -169,6 +171,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             actual_minutes: r.actual_minutes,
             rating: r.rating
           }));
+
+          // Check if new pending request arrived
+          if (mapped.length > previousCountRef.current) {
+            const latest = mapped[0];
+            if (latest.status === 'pendiente' && currentUser.role === 'masajista') {
+              playNotificationChime();
+              if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('🐻 ¡Nueva Petición de Masaje!', {
+                  body: `Mataosos te ha pedido un masaje de ${latest.minutes} min`,
+                  icon: '/pwa-icon.png'
+                });
+              }
+            }
+          }
+          previousCountRef.current = mapped.length;
+
           setRequests(mapped);
         }
       } catch (e) {
@@ -176,40 +194,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
     };
 
+    // 1. Initial fetch
     fetchDbRequests();
 
-    // Subscribe to database changes live & send Push Notification
+    // 2. Smart Polling every 3 seconds (Guarantees sync across all mobile devices even if WebSocket pauses)
+    const pollInterval = setInterval(() => {
+      fetchDbRequests();
+    }, 3000);
+
+    // 3. Realtime WebSocket listener
     const channel = supabase
       .channel('realtime_requests_channel')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'requests' },
-        (payload: any) => {
-          playNotificationChime();
-
-          if (payload.eventType === 'INSERT' && currentUser.role === 'masajista') {
-            if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification('🐻 ¡Nueva Petición de Masaje!', {
-                body: `Mataosos te ha pedido un masaje de ${payload.new.minutes} min`,
-                icon: '/pwa-icon.png'
-              });
-            }
-          } else if (payload.eventType === 'UPDATE' && currentUser.role === 'cliente') {
-            const statusText = payload.new.status === 'aprobada' ? '¡Aprobada! 🎉' : payload.new.status === 'rechazada' ? 'Rechazada' : payload.new.status;
-            if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification('🍄 Respuesta de Masaje', {
-                body: `Tu solicitud ha sido: ${statusText}`,
-                icon: '/pwa-icon.png'
-              });
-            }
-          }
-
+        () => {
           fetchDbRequests();
         }
       )
       .subscribe();
 
     return () => {
+      clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
   }, [currentUser]);
@@ -308,7 +314,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     try {
       await supabase.from('requests').insert([{
-        user_id: currentUser?.id && currentUser.id !== 'u1' ? currentUser.id : undefined,
+        user_id: currentUser?.id && !currentUser.id.startsWith('u') ? currentUser.id : undefined,
         minutes,
         note,
         status: 'pendiente'
