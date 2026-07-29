@@ -28,3 +28,37 @@ export function playZenGong() {
     console.log("Audio not supported or interaction required first.");
   }
 }
+
+export function playNotificationChime() {
+  try {
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContext) return;
+    
+    const ctx = new AudioContext();
+    
+    // 2-tone melodic chime
+    [523.25, 659.25, 783.99].forEach((freq, index) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + index * 0.12);
+      
+      gain.gain.setValueAtTime(0, ctx.currentTime + index * 0.12);
+      gain.gain.linearRampToValueAtTime(0.6, ctx.currentTime + index * 0.12 + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + index * 0.12 + 1.2);
+      
+      osc.start(ctx.currentTime + index * 0.12);
+      osc.stop(ctx.currentTime + index * 0.12 + 1.25);
+    });
+
+    if (navigator.vibrate) {
+      navigator.vibrate([200, 100, 200]);
+    }
+  } catch (e) {
+    console.log("Notification sound failed:", e);
+  }
+}

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Check } from 'lucide-react';
+import { Check, Bell, BellOff } from 'lucide-react';
 
 export const SettingsView: React.FC = () => {
-  const { currentUser, updateProfile } = useAppContext();
+  const { currentUser, updateProfile, requestNotificationPermission, notificationsEnabled } = useAppContext();
   const [name, setName] = useState(currentUser?.name || '');
   const [emoji, setEmoji] = useState(currentUser?.avatar_emoji || '🐻');
   const [saved, setSaved] = useState(false);
@@ -40,7 +40,7 @@ export const SettingsView: React.FC = () => {
         </div>
 
         <div>
-          <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--zen-forest-medium)', marginBottom: '10px', letterSpacing: '0.04em' }}>
+          <label style={{ display: 'block', fontSize: '0.8rem', fontWeight 700, color: 'var(--zen-forest-medium)', marginBottom: '10px', letterSpacing: '0.04em' }}>
             EMOJI AVATAR
           </label>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', width: '100%' }}>
@@ -68,6 +68,25 @@ export const SettingsView: React.FC = () => {
                 {e}
               </button>
             ))}
+          </div>
+        </div>
+
+        <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--zen-border-subtle)' }}>
+          <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--zen-forest-medium)', marginBottom: '8px', letterSpacing: '0.04em' }}>
+            NOTIFICACIONES AL MÓVIL
+          </label>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--zen-bg-card-alt)', padding: '12px 16px', borderRadius: '14px', border: '1px solid var(--zen-border)' }}>
+            <span style={{ fontSize: '0.9rem', color: 'var(--zen-text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {notificationsEnabled ? <Bell size={18} color="var(--zen-forest-dark)" /> : <BellOff size={18} color="var(--zen-text-muted)" />}
+              {notificationsEnabled ? 'Notificaciones de móvil activas' : 'Notificaciones inactivas'}
+            </span>
+            <button
+              onClick={requestNotificationPermission}
+              className={`zen-button ${notificationsEnabled ? 'secondary' : 'primary'}`}
+              style={{ width: 'auto', padding: '8px 14px', fontSize: '0.85rem' }}
+            >
+              {notificationsEnabled ? 'Activas' : 'Activar'}
+            </button>
           </div>
         </div>
 

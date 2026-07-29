@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User, SessionLog, MassageRequest } from '../types';
 import { DailyBalance, getLocalDateString, calculateNewDayBalance } from '../utils/timeEngine';
 import { supabase } from '../lib/supabase';
+import { playNotificationChime } from '../utils/audioEngine';
 
 interface AppState {
   currentUser: User | null;
@@ -16,6 +17,8 @@ interface AppState {
   logout: () => void;
   resetApp: () => void;
   setDemoUser: (role: 'cliente' | 'masajista') => void;
+  requestNotificationPermission: () => void;
+  notificationsEnabled: boolean;
 }
 
 const defaultUser: User = { id: 'u1', name: 'Mataosos', role: 'cliente', avatar_emoji: '🐻' };
@@ -34,6 +37,8 @@ const defaultState: AppState = {
   logout: () => {},
   resetApp: () => {},
   setDemoUser: () => {},
+  requestNotificationPermission: () => {},
+  notificationsEnabled: false
 };
 
 const AppContext = createContext<AppState>(defaultState);
@@ -58,6 +63,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const saved = localStorage.getItem('zen_requests');
     return saved ? JSON.parse(saved) : [];
   });
+
+  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(() => {
+    return typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted';
+  });
+
+  const requestNotificationPermission = async () => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        setNotificationsEnabled(true);
+        new Notification('🌿 Zen Masajes', {
+          body: '¡Notificaciones activadas con éxito!',
+          icon: '/pwa-icon.png'
+        });
+      }
+    }
+  };
 
   // Supabase Auth listener
   useEffect(() => {
@@ -97,7 +119,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setCurrentUser(u);
         localStorage.setItem('zen_current_user', JSON.stringify(u));
       } else {
-        // If profile doesn't exist in profiles table yet, auto-create it!
         const isGnomo = email?.toLowerCase().includes('sylvia') || false;
         const newRole: 'cliente' | 'masajista' = isGnomo ? 'masajista' : 'cliente';
         const newName = isGnomo ? 'Gnomo' : 'Mataosos';
@@ -118,7 +139,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
     } catch (e) {
       console.warn('Error fetching profile from Supabase:', e);
-      // Fallback user if query fails
       const isGnomo = email?.toLowerCase().includes('sylvia') || false;
       const u = isGnomo ? adminUser : defaultUser;
       setCurrentUser(u);
@@ -126,7 +146,75 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
-  // Cross-tab & local storage synchronization
+  // 🔔 REALTIME SUPABASE SYNC ACROSS DEVICES WITH PUSH NOTIFICATIONS
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const fetchDbRequests = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('requests')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (data && !error) {
+          const mapped: MassageRequest[] = data.map(r => ({
+            id: r.id,
+            created_at: new Date(r.created_at).getTime(),
+            minutes: r.minutes,
+            note: r.note,
+            status: r.status,
+            reject_reason: r.reject_reason,
+            started_at: r.started_at ? new Date(r.started_at).getTime() : undefined,
+            actual_minutes: r.actual_minutes,
+            rating: r.rating
+          }));
+          setRequests(mapped);
+        }
+      } catch (e) {
+        console.warn('Could not sync requests from Supabase:', e);
+      }
+    };
+
+    fetchDbRequests();
+
+    // Subscribe to database changes live & send Push Notification
+    const channel = supabase
+      .channel('realtime_requests_channel')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'requests' },
+        (payload: any) => {
+          playNotificationChime();
+
+          if (payload.eventType === 'INSERT' && currentUser.role === 'masajista') {
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('🐻 ¡Nueva Petición de Masaje!', {
+                body: `Mataosos te ha pedido un masaje de ${payload.new.minutes} min`,
+                icon: '/pwa-icon.png'
+              });
+            }
+          } else if (payload.eventType === 'UPDATE' && currentUser.role === 'cliente') {
+            const statusText = payload.new.status === 'aprobada' ? '¡Aprobada! 🎉' : payload.new.status === 'rechazada' ? 'Rechazada' : payload.new.status;
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('🍄 Respuesta de Masaje', {
+                body: `Tu solicitud ha sido: ${statusText}`,
+                icon: '/pwa-icon.png'
+              });
+            }
+          }
+
+          fetchDbRequests();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentUser]);
+
+  // Cross-tab local fallback synchronization
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'zen_requests' && e.newValue) setRequests(JSON.parse(e.newValue));
@@ -209,24 +297,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const createRequest = async (minutes: number, note?: string) => {
-    const newReq: MassageRequest = {
+    const tempReq: MassageRequest = {
       id: Date.now().toString(),
       created_at: Date.now(),
       minutes,
       note,
       status: 'pendiente'
     };
-    setRequests(prev => [newReq, ...prev]);
+    setRequests(prev => [tempReq, ...prev]);
 
     try {
-      if (currentUser?.id) {
-        await supabase.from('requests').insert([{
-          user_id: currentUser.id,
-          minutes,
-          note,
-          status: 'pendiente'
-        }]);
-      }
+      await supabase.from('requests').insert([{
+        user_id: currentUser?.id && currentUser.id !== 'u1' ? currentUser.id : undefined,
+        minutes,
+        note,
+        status: 'pendiente'
+      }]);
     } catch (e) {
       console.warn('Could not save request to Supabase:', e);
     }
@@ -315,7 +401,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       recordSession,
       logout,
       resetApp,
-      setDemoUser
+      setDemoUser,
+      requestNotificationPermission,
+      notificationsEnabled
     }}>
       {children}
     </AppContext.Provider>

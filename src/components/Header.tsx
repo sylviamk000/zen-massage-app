@@ -1,9 +1,9 @@
 import React from 'react';
-import { LogOut, RotateCcw } from 'lucide-react';
+import { LogOut, RotateCcw, Bell, BellOff } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 export const Header: React.FC = () => {
-  const { currentUser, logout, resetApp } = useAppContext();
+  const { currentUser, logout, resetApp, requestNotificationPermission, notificationsEnabled } = useAppContext();
 
   if (!currentUser) return null;
 
@@ -27,13 +27,29 @@ export const Header: React.FC = () => {
         </p>
       </div>
       
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+        {/* Notification Bell Button */}
+        <button
+          onClick={requestNotificationPermission}
+          className={`zen-button ${notificationsEnabled ? 'secondary' : 'primary'}`}
+          style={{ 
+            padding: '8px 10px', 
+            borderRadius: '20px', 
+            width: 'auto', 
+            fontSize: '0.8rem',
+            ...(notificationsEnabled && { background: 'var(--zen-bg-card-alt)', color: 'var(--zen-forest-dark)' })
+          }}
+          title={notificationsEnabled ? 'Notificaciones activadas' : 'Activar notificaciones en el móvil'}
+        >
+          {notificationsEnabled ? <Bell size={15} color="var(--zen-forest-dark)" /> : <BellOff size={15} />}
+        </button>
+
         {/* Reset button ONLY visible for Gnomo (masajista) */}
         {currentUser.role === 'masajista' && (
           <button 
             onClick={resetApp}
             className="zen-button danger"
-            style={{ padding: '8px 12px', fontSize: '0.8rem', width: 'auto', borderRadius: '20px', gap: '4px' }}
+            style={{ padding: '8px 10px', fontSize: '0.8rem', width: 'auto', borderRadius: '20px', gap: '4px' }}
             title="Reiniciar aplicación"
           >
             <RotateCcw size={14} /> Reset
@@ -44,7 +60,7 @@ export const Header: React.FC = () => {
         <button 
           onClick={logout}
           className="zen-button secondary"
-          style={{ padding: '8px 12px', borderRadius: '20px', width: 'auto', fontSize: '0.8rem', gap: '6px' }}
+          style={{ padding: '8px 10px', borderRadius: '20px', width: 'auto', fontSize: '0.8rem', gap: '4px' }}
           title="Cerrar sesión"
         >
           <LogOut size={14} /> Salir
