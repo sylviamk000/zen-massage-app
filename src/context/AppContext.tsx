@@ -137,7 +137,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setCurrentUser(u);
         localStorage.setItem('zen_current_user', JSON.stringify(u));
 
-        await supabase.from('profiles').insert([newProfile]);
+        await supabase.from('profiles').upsert([newProfile]);
       }
     } catch (e) {
       console.warn('Error fetching profile from Supabase:', e);
@@ -184,6 +184,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         previousCountRef.current = mapped.length;
 
         setRequests(mapped);
+      } else if (error) {
+        console.warn('Error fetching requests from Supabase:', error.message);
       }
     } catch (e) {
       console.warn('Could not sync requests from Supabase:', e);
@@ -292,7 +294,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       localStorage.setItem('zen_current_user', JSON.stringify(updated));
 
       try {
-        await supabase.from('profiles').update({ name, avatar_emoji }).eq('id', currentUser.id);
+        const { error } = await supabase.from('profiles').upsert([{
+          id: currentUser.id,
+          name,
+          avatar_emoji,
+          role: currentUser.role
+        }]);
+
+        if (error) {
+          console.warn('Could not save profile to Supabase:', error.message);
+        }
       } catch (e) {
         console.warn('Could not update profile in Supabase:', e);
       }
@@ -312,7 +323,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     try {
       const payload: any = {
         minutes,
-        note,
+        note: note || null,
         status: 'pendiente'
       };
 
@@ -322,12 +333,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       const { error } = await supabase.from('requests').insert([payload]);
       if (error) {
-        console.warn('Supabase insert request error:', error.message);
+        console.error('Supabase insert request error:', error.message);
+        alert('Aviso Supabase: ' + error.message);
       } else {
         fetchDbRequests();
       }
-    } catch (e) {
-      console.warn('Could not save request to Supabase:', e);
+    } catch (e: any) {
+      console.error('Could not save request to Supabase:', e);
+      alert('Error de conexión a Supabase: ' + (e.message || 'Desconocido'));
     }
   };
 
@@ -348,8 +361,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     try {
       const payload: any = {
         status,
-        reject_reason: options?.reject_reason,
-        rating: options?.rating
+        reject_reason: options?.reject_reason || null,
+        rating: options?.rating || null
       };
 
       if (status === 'en_curso') {
