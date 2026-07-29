@@ -63,13 +63,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        fetchProfile(session.user.id);
+        fetchProfile(session.user.id, session.user.email);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        fetchProfile(session.user.id);
+        fetchProfile(session.user.id, session.user.email);
       } else {
         const saved = localStorage.getItem('zen_current_user');
         if (!saved) setCurrentUser(null);
@@ -79,13 +79,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, email?: string) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (data && !error) {
         const u: User = {
@@ -96,9 +96,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         };
         setCurrentUser(u);
         localStorage.setItem('zen_current_user', JSON.stringify(u));
+      } else {
+        // If profile doesn't exist in profiles table yet, auto-create it!
+        const isGnomo = email?.toLowerCase().includes('sylvia') || false;
+        const newRole: 'cliente' | 'masajista' = isGnomo ? 'masajista' : 'cliente';
+        const newName = isGnomo ? 'Gnomo' : 'Mataosos';
+        const newEmoji = isGnomo ? '🍄' : '🐻';
+
+        const newProfile = {
+          id: userId,
+          name: newName,
+          role: newRole,
+          avatar_emoji: newEmoji
+        };
+
+        const u: User = { id: userId, name: newName, role: newRole, avatar_emoji: newEmoji };
+        setCurrentUser(u);
+        localStorage.setItem('zen_current_user', JSON.stringify(u));
+
+        await supabase.from('profiles').insert([newProfile]);
       }
     } catch (e) {
       console.warn('Error fetching profile from Supabase:', e);
+      // Fallback user if query fails
+      const isGnomo = email?.toLowerCase().includes('sylvia') || false;
+      const u = isGnomo ? adminUser : defaultUser;
+      setCurrentUser(u);
+      localStorage.setItem('zen_current_user', JSON.stringify(u));
     }
   };
 
@@ -161,7 +185,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.warn('Signout error:', e);
+    }
     localStorage.removeItem('zen_current_user');
     setCurrentUser(null);
   };
