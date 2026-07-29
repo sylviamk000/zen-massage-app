@@ -189,7 +189,7 @@ export const UserDashboard: React.FC = () => {
             </button>
             {currentRequest.status === 'aprobada' && (
               <button className="zen-button primary" onClick={handleStartSession} style={{ flex: 1 }}>
-                <Sparkles size={18} /> Comenzar
+                Comenzar
               </button>
             )}
           </div>
@@ -202,7 +202,7 @@ export const UserDashboard: React.FC = () => {
             style={{ marginBottom: '1.5rem', padding: '18px 24px', fontSize: '1.05rem' }}
             disabled={remainingMinutes <= 0}
           >
-            <Sparkles size={20} /> {remainingMinutes <= 0 ? 'Sin minutos restantes hoy' : 'Pedir masaje'}
+            {remainingMinutes <= 0 ? 'Sin minutos restantes hoy' : 'Pedir masaje'}
           </button>
         )
       )}
