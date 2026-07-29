@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { User, SessionLog, MassageRequest } from '../types';
 import { DailyBalance, getLocalDateString, calculateNewDayBalance } from '../utils/timeEngine';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { playNotificationChime } from '../utils/audioEngine';
 
 interface AppState {
@@ -320,6 +320,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
     setRequests(prev => [tempReq, ...prev]);
 
+    if (!isSupabaseConfigured) {
+      alert('⚠️ Supabase no está conectado en Vercel.\n\nFalta añadir VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en Vercel -> Settings -> Environment Variables y pulsar Redeploy.');
+      return;
+    }
+
     try {
       const payload: any = {
         minutes,
@@ -334,7 +339,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       const { error } = await supabase.from('requests').insert([payload]);
       if (error) {
         console.error('Supabase insert request error:', error.message);
-        alert('Aviso Supabase: ' + error.message);
+        if (error.message.includes('Invalid path')) {
+          alert('⚠️ Error de conexión a Supabase: La URL configurada en Vercel tiene un formato o barra sobrante.\nRevisa VITE_SUPABASE_URL en Vercel.');
+        } else {
+          alert('Aviso Supabase: ' + error.message);
+        }
       } else {
         fetchDbRequests();
       }
