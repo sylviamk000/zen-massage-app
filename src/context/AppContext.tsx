@@ -148,61 +148,58 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
-  // 🔔 REALTIME SUPABASE SYNC + 3s SMART POLLING FOR MAXIMUM MOBILE RELIABILITY
+  const fetchDbRequests = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (data && !error) {
+        const mapped: MassageRequest[] = data.map(r => ({
+          id: r.id,
+          created_at: new Date(r.created_at).getTime(),
+          minutes: r.minutes,
+          note: r.note,
+          status: r.status,
+          reject_reason: r.reject_reason,
+          started_at: r.started_at ? new Date(r.started_at).getTime() : undefined,
+          actual_minutes: r.actual_minutes,
+          rating: r.rating
+        }));
+
+        // Check if new pending request arrived
+        if (mapped.length > previousCountRef.current && currentUser?.role === 'masajista') {
+          const latest = mapped[0];
+          if (latest.status === 'pendiente') {
+            playNotificationChime();
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('🐻 ¡Nueva Petición de Masaje!', {
+                body: `Mataosos te ha pedido un masaje de ${latest.minutes} min`,
+                icon: '/pwa-icon.png'
+              });
+            }
+          }
+        }
+        previousCountRef.current = mapped.length;
+
+        setRequests(mapped);
+      }
+    } catch (e) {
+      console.warn('Could not sync requests from Supabase:', e);
+    }
+  };
+
+  // 🔔 REALTIME SUPABASE SYNC + 3s SMART POLLING
   useEffect(() => {
     if (!currentUser) return;
 
-    const fetchDbRequests = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('requests')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (data && !error) {
-          const mapped: MassageRequest[] = data.map(r => ({
-            id: r.id,
-            created_at: new Date(r.created_at).getTime(),
-            minutes: r.minutes,
-            note: r.note,
-            status: r.status,
-            reject_reason: r.reject_reason,
-            started_at: r.started_at ? new Date(r.started_at).getTime() : undefined,
-            actual_minutes: r.actual_minutes,
-            rating: r.rating
-          }));
-
-          // Check if new pending request arrived
-          if (mapped.length > previousCountRef.current) {
-            const latest = mapped[0];
-            if (latest.status === 'pendiente' && currentUser.role === 'masajista') {
-              playNotificationChime();
-              if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('🐻 ¡Nueva Petición de Masaje!', {
-                  body: `Mataosos te ha pedido un masaje de ${latest.minutes} min`,
-                  icon: '/pwa-icon.png'
-                });
-              }
-            }
-          }
-          previousCountRef.current = mapped.length;
-
-          setRequests(mapped);
-        }
-      } catch (e) {
-        console.warn('Could not sync requests from Supabase:', e);
-      }
-    };
-
-    // 1. Initial fetch
     fetchDbRequests();
 
-    // 2. Smart Polling every 3 seconds (Guarantees sync across all mobile devices even if WebSocket pauses)
     const pollInterval = setInterval(() => {
       fetchDbRequests();
     }, 3000);
 
-    // 3. Realtime WebSocket listener
     const channel = supabase
       .channel('realtime_requests_channel')
       .on(
@@ -313,12 +310,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setRequests(prev => [tempReq, ...prev]);
 
     try {
-      await supabase.from('requests').insert([{
-        user_id: currentUser?.id && !currentUser.id.startsWith('u') ? currentUser.id : undefined,
+      const payload: any = {
         minutes,
         note,
         status: 'pendiente'
-      }]);
+      };
+
+      if (currentUser?.id && currentUser.id.length > 20) {
+        payload.user_id = currentUser.id;
+      }
+
+      const { error } = await supabase.from('requests').insert([payload]);
+      if (error) {
+        console.warn('Supabase insert request error:', error.message);
+      } else {
+        fetchDbRequests();
+      }
     } catch (e) {
       console.warn('Could not save request to Supabase:', e);
     }
@@ -339,12 +346,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }));
 
     try {
-      await supabase.from('requests').update({ 
-        status, 
+      const payload: any = {
+        status,
         reject_reason: options?.reject_reason,
-        rating: options?.rating,
-        started_at: status === 'en_curso' ? new Date().toISOString() : undefined
-      }).eq('id', id);
+        rating: options?.rating
+      };
+
+      if (status === 'en_curso') {
+        payload.started_at = new Date().toISOString();
+      }
+
+      const { error } = await supabase.from('requests').update(payload).eq('id', id);
+      if (error) {
+        console.warn('Supabase update request error:', error.message);
+      } else {
+        fetchDbRequests();
+      }
     } catch (e) {
       console.warn('Could not update request in Supabase:', e);
     }
