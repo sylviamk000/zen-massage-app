@@ -1,9 +1,11 @@
 import React from 'react';
-import { RefreshCw } from 'lucide-react';
+import { LogOut, RotateCcw } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 export const Header: React.FC = () => {
-  const { currentUser, switchRole, resetApp } = useAppContext();
+  const { currentUser, logout, resetApp } = useAppContext();
+
+  if (!currentUser) return null;
 
   return (
     <header style={{
@@ -17,33 +19,36 @@ export const Header: React.FC = () => {
       zIndex: 10
     }}>
       <div>
-        <h1 style={{ margin: '0 0 2px 0', fontSize: '1.75rem', fontWeight: 600, color: 'var(--zen-forest-dark)' }}>
+        <h1 style={{ margin: '0 0 2px 0', fontSize: '1.65rem', fontWeight: 600, color: 'var(--zen-forest-dark)' }}>
           Hola, {currentUser.name} {currentUser.avatar_emoji}
         </h1>
-        <p style={{ margin: 0, color: 'var(--zen-text-muted)', fontSize: '0.9rem', fontWeight: 500 }}>
-          {currentUser.role === 'cliente' ? '¿Te apetece un masaje hoy?' : 'Panel de gestión para Gnomo'}
+        <p style={{ margin: 0, color: 'var(--zen-text-muted)', fontSize: '0.85rem', fontWeight: 500 }}>
+          {currentUser.role === 'cliente' ? '¿Te apetece un masaje hoy?' : 'Panel de administración zen'}
         </p>
       </div>
       
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <button 
-          onClick={switchRole}
-          className="zen-button secondary"
-          style={{ padding: '8px 12px', borderRadius: '20px', width: 'auto', fontSize: '0.8rem', gap: '6px' }}
-          title="Cambiar Rol (Demo)"
-        >
-          <RefreshCw size={14} />
-          {currentUser.role === 'cliente' ? 'Gnomo' : 'Mataosos'}
-        </button>
-        {currentUser.role === 'cliente' && (
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        {/* Reset button ONLY visible for Gnomo (masajista) */}
+        {currentUser.role === 'masajista' && (
           <button 
             onClick={resetApp}
             className="zen-button danger"
-            style={{ padding: '8px 12px', fontSize: '0.8rem', width: 'auto', borderRadius: '20px' }}
+            style={{ padding: '8px 12px', fontSize: '0.8rem', width: 'auto', borderRadius: '20px', gap: '4px' }}
+            title="Reiniciar aplicación"
           >
-            Reset
+            <RotateCcw size={14} /> Reset
           </button>
         )}
+
+        {/* Logout Button */}
+        <button 
+          onClick={logout}
+          className="zen-button secondary"
+          style={{ padding: '8px 12px', borderRadius: '20px', width: 'auto', fontSize: '0.8rem', gap: '6px' }}
+          title="Cerrar sesión"
+        >
+          <LogOut size={14} /> Salir
+        </button>
       </div>
     </header>
   );

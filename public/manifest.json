@@ -1,0 +1,17 @@
+{
+  "short_name": "Zen Masajes",
+  "name": "Zen Zen Regulado",
+  "icons": [
+    {
+      "src": "/pwa-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#1f2a21",
+  "theme_color": "#233226",
+  "display": "standalone",
+  "orientation": "portrait"
+}

@@ -254,7 +254,7 @@ export const UserDashboard: React.FC = () => {
           <textarea 
             value={requestNote}
             onChange={e => setRequestNote(e.target.value)}
-            placeholder="hoy tambien glops"
+            placeholder='ej: "Hoy también quiero glops"'
             style={{ 
               width: '100%', padding: '14px', borderRadius: '14px', 
               border: '1.5px solid var(--zen-border)', marginBottom: '1.25rem',

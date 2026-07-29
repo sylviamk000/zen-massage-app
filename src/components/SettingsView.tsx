@@ -4,8 +4,8 @@ import { Check } from 'lucide-react';
 
 export const SettingsView: React.FC = () => {
   const { currentUser, updateProfile } = useAppContext();
-  const [name, setName] = useState(currentUser.name);
-  const [emoji, setEmoji] = useState(currentUser.avatar_emoji);
+  const [name, setName] = useState(currentUser?.name || '');
+  const [emoji, setEmoji] = useState(currentUser?.avatar_emoji || '🐻');
   const [saved, setSaved] = useState(false);
 
   const handleSave = () => {
@@ -43,18 +43,26 @@ export const SettingsView: React.FC = () => {
           <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--zen-forest-medium)', marginBottom: '10px', letterSpacing: '0.04em' }}>
             EMOJI AVATAR
           </label>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', width: '100%' }}>
             {['🐻', '🍄', '🦊', '🐨', '🐼'].map(e => (
               <button 
                 key={e}
                 type="button"
                 onClick={() => setEmoji(e)}
                 style={{
-                  fontSize: '2rem', padding: '12px', flex: 1,
+                  fontSize: '1.75rem', 
+                  padding: '10px 4px', 
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   background: emoji === e ? 'var(--zen-forest-light)' : 'var(--zen-bg-card-alt)',
                   border: emoji === e ? '2px solid var(--zen-forest-dark)' : '1px solid var(--zen-border)',
-                  borderRadius: '16px', cursor: 'pointer', transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                  transform: emoji === e ? 'scale(1.05)' : 'scale(1)'
+                  borderRadius: '16px', 
+                  cursor: 'pointer', 
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  transform: emoji === e ? 'scale(1.05)' : 'scale(1)',
+                  width: '100%',
+                  boxSizing: 'border-box'
                 }}
               >
                 {e}

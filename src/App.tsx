@@ -4,12 +4,17 @@ import { UserDashboard } from './components/UserDashboard';
 import { AdminDashboard } from './components/AdminDashboard';
 import { HistoryView } from './components/HistoryView';
 import { SettingsView } from './components/SettingsView';
+import { LoginView } from './components/LoginView';
 import { useAppContext } from './context/AppContext';
 import { Clock, Home, Settings } from 'lucide-react';
 
 function App() {
-  const { currentUser } = useAppContext();
+  const { currentUser, setDemoUser } = useAppContext();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'settings'>('dashboard');
+
+  if (!currentUser) {
+    return <LoginView onDemoLogin={(role) => setDemoUser(role)} />;
+  }
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -39,7 +44,7 @@ function App() {
           onClick={() => setActiveTab('dashboard')}
           style={{ 
             background: 'none', border: 'none', 
-            color: activeTab === 'dashboard' ? 'var(--zen-accent-dark)' : 'var(--zen-text-muted)',
+            color: activeTab === 'dashboard' ? 'var(--zen-forest-dark)' : 'var(--zen-text-muted)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
             cursor: 'pointer',
             fontFamily: 'var(--font-sans)',
@@ -53,7 +58,7 @@ function App() {
           onClick={() => setActiveTab('history')}
           style={{ 
             background: 'none', border: 'none', 
-            color: activeTab === 'history' ? 'var(--zen-accent-dark)' : 'var(--zen-text-muted)',
+            color: activeTab === 'history' ? 'var(--zen-forest-dark)' : 'var(--zen-text-muted)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
             cursor: 'pointer',
             fontFamily: 'var(--font-sans)',
@@ -67,7 +72,7 @@ function App() {
           onClick={() => setActiveTab('settings')}
           style={{ 
             background: 'none', border: 'none', 
-            color: activeTab === 'settings' ? 'var(--zen-accent-dark)' : 'var(--zen-text-muted)',
+            color: activeTab === 'settings' ? 'var(--zen-forest-dark)' : 'var(--zen-text-muted)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
             cursor: 'pointer',
             fontFamily: 'var(--font-sans)',
