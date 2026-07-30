@@ -310,6 +310,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   }, [currentUser]);
 
+  // Wake up sync immediately when user unlocks phone or opens browser tab
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if ((document.visibilityState === 'visible' || document.hasFocus()) && currentUser) {
+        fetchDbData();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+    };
+  }, [currentUser]);
+
   // Cross-tab local fallback synchronization
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
@@ -514,11 +529,31 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setRequests(prev => prev.map(req => req.id === reqId ? { ...req, status: 'completada', actual_minutes: Math.floor(durationConsumed/60), rating } : req));
   };
 
-  const resetApp = () => {
-    localStorage.removeItem('zen_dailyBalance');
-    localStorage.removeItem('zen_history');
-    localStorage.removeItem('zen_requests');
-    localStorage.removeItem('zen_current_user');
+  const resetApp = async () => {
+    const confirmReset = window.confirm(
+      '⚠️ ¿Estás seguro/a de que deseas borrar TODAS las peticiones y el historial tanto de la aplicación como de la Base de Datos en Supabase?\n\nLa app volverá al estado inicial de 0.'
+    );
+    if (!confirmReset) return;
+
+    try {
+      // 1. Delete all requests in Supabase DB
+      await supabase.from('requests').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
+      // 2. Reset daily balance in Supabase DB to 20 minutes
+      const todayStr = getLocalDateString();
+      await supabase.from('daily_balance').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('daily_balance').upsert([{
+        id: '00000000-0000-0000-0000-000000000001',
+        date: todayStr,
+        total_starting_balance: 20,
+        used_today: 0
+      }]);
+    } catch (e) {
+      console.warn('Could not reset Supabase database tables:', e);
+    }
+
+    // 3. Clear local Storage and state
+    localStorage.clear();
     setDailyBalance(null);
     setHistory([]);
     setRequests([]);

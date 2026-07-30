@@ -141,25 +141,29 @@ export const UserDashboard: React.FC = () => {
   return (
     <div className="fade-in" style={{ padding: '0 1.25rem 2rem 1.25rem', maxWidth: '580px', margin: '0 auto', position: 'relative' }}>
       
-      {/* Toast Notification message at bottom */}
+      {/* Toast Notification message at TOP CENTER */}
       {toastMessage && (
         <div className="fade-in" style={{
           position: 'fixed',
-          bottom: '85px',
+          top: '24px',
           left: '50%',
           transform: 'translateX(-50%)',
           background: 'var(--zen-forest-dark)',
           color: '#FFFFFF',
-          padding: '12px 22px',
-          borderRadius: '24px',
-          boxShadow: '0 12px 28px rgba(0,0,0,0.25)',
-          zIndex: 1000,
+          padding: '14px 24px',
+          borderRadius: '30px',
+          boxShadow: '0 12px 32px rgba(0,0,0,0.3)',
+          zIndex: 10000,
           fontSize: '0.95rem',
           fontWeight: 600,
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'center',
           gap: '8px',
-          border: '1px solid rgba(255,255,255,0.2)'
+          border: '1.5px solid rgba(255,255,255,0.25)',
+          width: 'max-content',
+          maxWidth: '88vw',
+          textAlign: 'center'
         }}>
           <span>✨</span> {toastMessage}
         </div>
