@@ -1,6 +1,6 @@
 /* src/index.css */
 :root {
-  /* Premium Natural Zen Palette */
+  /* Premium Natural Zen Light Palette */
   --zen-bg: #F5F2EB;
   --zen-bg-card: #FFFFFF;
   --zen-bg-card-alt: #FAFAF7;
@@ -36,6 +36,38 @@
   --font-sans: 'Sora', sans-serif;
 }
 
+/* Dark Mode Overrides */
+body.dark-mode {
+  --zen-bg: #121914;
+  --zen-bg-card: #1B261D;
+  --zen-bg-card-alt: #233126;
+  --zen-bg-subtle: #2C3C2F;
+  
+  --zen-text-main: #F3F6F4;
+  --zen-text-muted: #9EB0A1;
+  --zen-text-light: #768879;
+  
+  --zen-forest-dark: #81E6BB;
+  --zen-forest-medium: #34D399;
+  --zen-forest-light: #1F3628;
+  
+  --zen-amber: #F97316;
+  --zen-amber-light: #3D2210;
+  
+  --zen-sage-light: #273A2B;
+  --zen-border: #2D3E30;
+  --zen-border-subtle: #243327;
+
+  --status-pending-bg: #451A03;
+  --status-pending-text: #FDE68A;
+  
+  --status-approved-bg: #064E3B;
+  --status-approved-text: #A7F3D0;
+  
+  --status-rejected-bg: #7F1D1D;
+  --status-rejected-text: #FCA5A5;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
@@ -43,6 +75,7 @@ body {
   color: var(--zen-text-main);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 * {
@@ -54,17 +87,17 @@ body {
   background: var(--zen-bg-card);
   border-radius: 24px;
   padding: 1.5rem;
-  box-shadow: 0 10px 30px rgba(35, 50, 38, 0.04);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   border: 1px solid var(--zen-border-subtle);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .zen-card-hero {
-  background: linear-gradient(135deg, var(--zen-forest-dark) 0%, var(--zen-forest-medium) 100%);
+  background: linear-gradient(135deg, #1C2B20 0%, #2A3D2F 100%);
   color: #FFFFFF;
   border-radius: 28px;
   padding: 1.75rem;
-  box-shadow: 0 16px 36px rgba(35, 50, 38, 0.15);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -97,12 +130,16 @@ body {
   justify-content: center;
   gap: 10px;
   width: 100%;
-  box-shadow: 0 4px 14px rgba(35, 50, 38, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+body.dark-mode .zen-button {
+  color: #121914;
 }
 
 .zen-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(35, 50, 38, 0.18);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
   opacity: 0.96;
 }
 
@@ -112,7 +149,7 @@ body {
 
 .zen-button.primary {
   background: linear-gradient(135deg, #E68A36 0%, #C46618 100%);
-  color: #FFFFFF;
+  color: #FFFFFF !important;
   box-shadow: 0 6px 18px rgba(217, 119, 36, 0.25);
 }
 
@@ -122,7 +159,7 @@ body {
 
 .zen-button.secondary {
   background: var(--zen-bg-card);
-  color: var(--zen-forest-dark);
+  color: var(--zen-text-main);
   border: 1.5px solid var(--zen-border);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
@@ -133,15 +170,15 @@ body {
 }
 
 .zen-button.danger {
-  background: #FEE2E2;
-  color: #991B1B;
+  background: var(--status-rejected-bg);
+  color: var(--status-rejected-text) !important;
   border: 1px solid #FCA5A5;
   box-shadow: none;
 }
 
 .zen-button.danger:hover {
   background: #FCA5A5;
-  color: #7F1D1D;
+  color: #7F1D1D !important;
 }
 
 .zen-button:disabled {
