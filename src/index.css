@@ -36,38 +36,38 @@
   --font-sans: 'Sora', sans-serif;
 }
 
-/* Dark Mode Overrides - Warm, Modern & Cozy Zen */
+/* Dark Mode Overrides - Real Dark (Blacks & Warm Oranges UX/UI) */
 body.dark-mode {
-  --zen-bg: #111813;
-  --zen-bg-card: #19241B;
-  --zen-bg-card-alt: #222E25;
-  --zen-bg-subtle: #2C3A2F;
+  --zen-bg: #0F0F11;
+  --zen-bg-card: #18181B;
+  --zen-bg-card-alt: #242427;
+  --zen-bg-subtle: #2E2E33;
   
-  --zen-text-main: #F5F7F4;
-  --zen-text-muted: #A8B8AA;
-  --zen-text-light: #7E9081;
+  --zen-text-main: #FAFAFA;
+  --zen-text-muted: #A1A1AA;
+  --zen-text-light: #71717A;
   
-  /* Accents: Warm Champagne Gold & Organic Sage Green */
-  --zen-forest-dark: #E2C799;
-  --zen-forest-medium: #8BA88E;
-  --zen-forest-light: #203124;
+  /* Primary Accent: Vibrant & Warm Orange */
+  --zen-forest-dark: #FB923C;
+  --zen-forest-medium: #F97316;
+  --zen-forest-light: #2A170B;
   
-  --zen-amber: #E68A36;
-  --zen-amber-light: #362314;
+  --zen-amber: #F97316;
+  --zen-amber-light: #361A08;
   
-  --zen-sage-light: #283A2C;
-  --zen-border: #2D3D30;
-  --zen-border-subtle: #233226;
+  --zen-sage-light: #26262B;
+  --zen-border: #3F3F46;
+  --zen-border-subtle: #27272A;
 
   /* Status Colors */
-  --status-pending-bg: #3B2612;
-  --status-pending-text: #FCD34D;
+  --status-pending-bg: #451A03;
+  --status-pending-text: #FDBA74;
   
-  --status-approved-bg: #1B3322;
-  --status-approved-text: #8BA88E;
+  --status-approved-bg: #1A2E1E;
+  --status-approved-text: #4ADE80;
   
-  --status-rejected-bg: #3B1C1C;
-  --status-rejected-text: #F87171;
+  --status-rejected-bg: #451212;
+  --status-rejected-text: #FCA5A5;
 }
 
 body {
@@ -136,20 +136,26 @@ body {
 }
 
 body.dark-mode .zen-button {
-  background: #243327;
-  color: var(--zen-text-main) !important;
-  border: 1.5px solid var(--zen-border);
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  color: #FFFFFF !important;
+  border: none;
 }
 
 body.dark-mode .zen-button.secondary {
-  background: var(--zen-bg-card-alt);
-  color: var(--zen-text-main);
-  border: 1.5px solid var(--zen-border);
+  background: rgba(249, 115, 22, 0.12);
+  color: #FFEDD5;
+  border: 1.5px solid rgba(251, 146, 60, 0.4);
+}
+
+body.dark-mode .zen-button.secondary:hover {
+  background: rgba(249, 115, 22, 0.22);
+  border-color: #F97316;
+  color: #FFFFFF;
 }
 
 body.dark-mode .zen-button.danger {
-  background: var(--status-rejected-bg);
-  color: var(--status-rejected-text) !important;
+  background: #451212;
+  color: #FCA5A5 !important;
   border: 1.5px solid rgba(252, 165, 165, 0.3);
 }
 
