@@ -581,12 +581,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (lastSeenVersion !== APP_VERSION) {
       // 1. Send system OS push notification
       sendSystemNotification(
-        '✨ ¡Zen Masajes Actualizado!',
+        'Zen Masajes Actualizado',
         `Versión ${APP_VERSION}: ${APP_UPDATE_NOTES}`
       );
 
       // 2. Set in-app notification banner
-      setUpdateBannerMessage(`✨ ¡Novedad v${APP_VERSION}! ${APP_UPDATE_NOTES}`);
+      setUpdateBannerMessage(`Novedad v${APP_VERSION}! ${APP_UPDATE_NOTES}`);
       localStorage.setItem('zen_app_version', APP_VERSION);
     }
   }, [currentUser]);

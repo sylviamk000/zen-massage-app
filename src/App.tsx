@@ -7,7 +7,7 @@ import { SettingsView } from './components/SettingsView';
 import { LoginView } from './components/LoginView';
 import { useAppContext } from './context/AppContext';
 import { AchievementsView } from './components/AchievementsView';
-import { Clock, Home, User as UserIcon, Sparkles, X, Trophy } from 'lucide-react';
+import { Clock, Home, User as UserIcon, X, Trophy } from 'lucide-react';
 
 function App() {
   const { currentUser, setDemoUser, updateBannerMessage, dismissUpdateBanner } = useAppContext();
@@ -33,8 +33,7 @@ function App() {
           boxShadow: '0 4px 14px rgba(249, 115, 22, 0.35)',
           zIndex: 100
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingRight: '12px' }}>
-            <Sparkles size={18} style={{ flexShrink: 0 }} />
+          <div style={{ display: 'flex', alignItems: 'center', paddingRight: '12px' }}>
             <span>{updateBannerMessage}</span>
           </div>
           <button 
