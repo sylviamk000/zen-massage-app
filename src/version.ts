@@ -1,2 +1,2 @@
-export const APP_VERSION = '1.3.0';
-export const APP_UPDATE_NOTES = '¡Nueva versión disponible! Modo oscuro real (negros y naranjas), nuevo logo de seta y notificaciones optimizadas.';
+export const APP_VERSION = '1.4.0';
+export const APP_UPDATE_NOTES = '¡Novedades! Nuevo modo oscuro real (negros y naranjas), nuevo logo de seta y control de notificaciones al móvil optimizado.';
