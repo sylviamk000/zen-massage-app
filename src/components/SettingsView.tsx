@@ -3,7 +3,7 @@ import { useAppContext } from '../context/AppContext';
 import { Check, Bell, BellOff, LogOut, RotateCcw, Moon, Sun } from 'lucide-react';
 
 export const SettingsView: React.FC = () => {
-  const { currentUser, updateProfile, requestNotificationPermission, notificationsEnabled, logout, resetApp } = useAppContext();
+  const { currentUser, updateProfile, requestNotificationPermission, notificationsEnabled, testSystemNotification, logout, resetApp } = useAppContext();
   const [name, setName] = useState(currentUser?.name || '');
   const [emoji, setEmoji] = useState(currentUser?.avatar_emoji || '🐻');
   const [saved, setSaved] = useState(false);
@@ -182,6 +182,26 @@ export const SettingsView: React.FC = () => {
               }} />
             </div>
           </div>
+
+          {notificationsEnabled && (
+            <button
+              type="button"
+              className="zen-button secondary"
+              onClick={testSystemNotification}
+              style={{
+                marginTop: '10px',
+                width: '100%',
+                padding: '12px',
+                fontSize: '0.85rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+            >
+              <Bell size={16} color="var(--zen-amber)" /> Probar Notificación (Pulsar y salir/bloquear móvil)
+            </button>
+          )}
         </div>
 
         {/* REINICIAR APLICACIÓN (SÓLO DENTRO DEL PERFIL DEL GNOMO) */}

@@ -23,6 +23,7 @@ interface AppState {
   notificationsEnabled: boolean;
   updateBannerMessage: string | null;
   dismissUpdateBanner: () => void;
+  testSystemNotification: () => void;
 }
 
 const defaultUser: User = { id: 'u1', name: 'Mataosos', role: 'cliente', avatar_emoji: '🐻' };
@@ -44,7 +45,8 @@ const defaultState: AppState = {
   requestNotificationPermission: () => {},
   notificationsEnabled: false,
   updateBannerMessage: null,
-  dismissUpdateBanner: () => {}
+  dismissUpdateBanner: () => {},
+  testSystemNotification: () => {}
 };
 
 const AppContext = createContext<AppState>(defaultState);
@@ -616,6 +618,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setUpdateBannerMessage(null);
   };
 
+  const testSystemNotification = () => {
+    setTimeout(() => {
+      sendSystemNotification(
+        '🔔 Prueba de Notificación Zen',
+        '¡Funciona! Así te avisará el móvil cuando Mataosos o Gnomo soliciten o acepten un masaje.'
+      );
+    }, 3000);
+  };
+
   return (
     <AppContext.Provider value={{
       currentUser,
@@ -633,7 +644,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       requestNotificationPermission,
       notificationsEnabled,
       updateBannerMessage,
-      dismissUpdateBanner
+      dismissUpdateBanner,
+      testSystemNotification
     }}>
       {children}
     </AppContext.Provider>
