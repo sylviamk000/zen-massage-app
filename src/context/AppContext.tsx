@@ -571,27 +571,35 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     window.location.reload();
   };
 
-  const [updateBannerMessage, setUpdateBannerMessage] = useState<string | null>(null);
+  const [updateBannerMessage, setUpdateBannerMessage] = useState<string | null>(() => {
+    if (typeof window !== 'undefined' && sessionStorage.getItem('zen_banner_dismissed') !== 'true') {
+      return `Novedad v${APP_VERSION}! ${APP_UPDATE_NOTES}`;
+    }
+    return null;
+  });
 
-  // Auto-detect new app updates on startup
+  // Auto-detect new app updates on startup for OS push notification
   useEffect(() => {
     if (!currentUser) return;
 
     const lastSeenVersion = localStorage.getItem('zen_app_version');
     if (lastSeenVersion !== APP_VERSION) {
-      // 1. Send system OS push notification
       sendSystemNotification(
         'Zen Masajes Actualizado',
         `Versión ${APP_VERSION}: ${APP_UPDATE_NOTES}`
       );
-
-      // 2. Set in-app notification banner
-      setUpdateBannerMessage(`Novedad v${APP_VERSION}! ${APP_UPDATE_NOTES}`);
       localStorage.setItem('zen_app_version', APP_VERSION);
+    }
+
+    if (sessionStorage.getItem('zen_banner_dismissed') !== 'true') {
+      setUpdateBannerMessage(`Novedad v${APP_VERSION}! ${APP_UPDATE_NOTES}`);
     }
   }, [currentUser]);
 
-  const dismissUpdateBanner = () => setUpdateBannerMessage(null);
+  const dismissUpdateBanner = () => {
+    sessionStorage.setItem('zen_banner_dismissed', 'true');
+    setUpdateBannerMessage(null);
+  };
 
   return (
     <AppContext.Provider value={{
