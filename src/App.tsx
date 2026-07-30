@@ -6,7 +6,7 @@ import { HistoryView } from './components/HistoryView';
 import { SettingsView } from './components/SettingsView';
 import { LoginView } from './components/LoginView';
 import { useAppContext } from './context/AppContext';
-import { Clock, Home, Settings } from 'lucide-react';
+import { Clock, Home, User as UserIcon } from 'lucide-react';
 
 function App() {
   const { currentUser, setDemoUser } = useAppContext();
@@ -79,8 +79,8 @@ function App() {
             fontWeight: activeTab === 'settings' ? 600 : 400
           }}
         >
-          <Settings size={24} />
-          <span style={{ fontSize: '0.8rem' }}>Ajustes</span>
+          <UserIcon size={24} />
+          <span style={{ fontSize: '0.8rem' }}>Perfil</span>
         </button>
       </nav>
     </div>

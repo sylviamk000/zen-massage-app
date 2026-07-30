@@ -68,15 +68,60 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted';
   });
 
-  const previousCountRef = useRef<number>(requests.length);
+  const statusMapRef = useRef<{ [key: string]: string }>({});
+  const initialLoadRef = useRef<boolean>(true);
+
+  // Register service worker for background OS notifications
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(err => {
+        console.warn('Service worker registration failed:', err);
+      });
+    }
+  }, []);
 
   const requestNotificationPermission = async () => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         setNotificationsEnabled(true);
-        new Notification('🌿 Zen Masajes', {
-          body: '¡Notificaciones activadas con éxito!',
+        playNotificationChime();
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        
+        try {
+          const reg = await navigator.serviceWorker.ready;
+          reg.showNotification('🌿 Zen Masajes', {
+            body: '¡Notificaciones activadas con éxito!',
+            icon: '/pwa-icon.png'
+          });
+        } catch (e) {
+          new Notification('🌿 Zen Masajes', {
+            body: '¡Notificaciones activadas con éxito!',
+            icon: '/pwa-icon.png'
+          });
+        }
+      }
+    }
+  };
+
+  // Helper to send cross-device system notifications
+  const sendSystemNotification = async (title: string, body: string) => {
+    playNotificationChime();
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([200, 100, 200, 100, 400]);
+    }
+
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        reg.showNotification(title, {
+          body,
+          icon: '/pwa-icon.png',
+          badge: '/pwa-icon.png'
+        });
+      } catch (e) {
+        new Notification(title, {
+          body,
           icon: '/pwa-icon.png'
         });
       }
@@ -148,8 +193,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
-  const fetchDbRequests = async () => {
+  const syncDailyBalanceWithSupabase = async (bal: DailyBalance) => {
     try {
+      await supabase.from('daily_balance').upsert([{
+        id: '00000000-0000-0000-0000-000000000001',
+        date: bal.date,
+        total_starting_balance: bal.totalStartingBalance,
+        used_today: bal.usedToday
+      }]);
+    } catch (e) {
+      console.warn('Could not sync daily balance with Supabase:', e);
+    }
+  };
+
+  const fetchDbData = async () => {
+    try {
+      // 1. Fetch requests
       const { data, error } = await supabase
         .from('requests')
         .select('*')
@@ -168,27 +227,56 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           rating: r.rating
         }));
 
-        // Check if new pending request arrived
-        if (mapped.length > previousCountRef.current && currentUser?.role === 'masajista') {
-          const latest = mapped[0];
-          if (latest.status === 'pendiente') {
-            playNotificationChime();
-            if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification('🐻 ¡Nueva Petición de Masaje!', {
-                body: `Mataosos te ha pedido un masaje de ${latest.minutes} min`,
-                icon: '/pwa-icon.png'
-              });
+        // Notifications logic when status changes
+        if (!initialLoadRef.current) {
+          mapped.forEach(req => {
+            const oldStatus = statusMapRef.current[req.id];
+            
+            // Notification for Gnomo: New request created
+            if (!oldStatus && req.status === 'pendiente' && currentUser?.role === 'masajista') {
+              sendSystemNotification('🐻 ¡Nueva Petición de Masaje!', `Mataosos te ha solicitado un masaje de ${req.minutes} min.`);
             }
-          }
+
+            // Notification for Mataosos: Gnomo approved request
+            if (oldStatus && oldStatus !== 'aprobada' && req.status === 'aprobada' && currentUser?.role === 'cliente') {
+              sendSystemNotification('🍄 ¡Masaje Aprobado por Gnomo!', `Gnomo ha aceptado tu petición de ${req.minutes} min. ¡Puedes comenzar!`);
+            }
+
+            // Notification for Mataosos: Gnomo rejected request
+            if (oldStatus && oldStatus !== 'rechazada' && req.status === 'rechazada' && currentUser?.role === 'cliente') {
+              sendSystemNotification('🍄 Masaje Rechazado', `Gnomo ha rechazado la petición: "${req.reject_reason || 'Ahora no puedo'}"`);
+            }
+          });
         }
-        previousCountRef.current = mapped.length;
+
+        // Update status map
+        const newMap: { [key: string]: string } = {};
+        mapped.forEach(r => { newMap[r.id] = r.status; });
+        statusMapRef.current = newMap;
+        initialLoadRef.current = false;
 
         setRequests(mapped);
-      } else if (error) {
-        console.warn('Error fetching requests from Supabase:', error.message);
+      }
+
+      // 2. Fetch daily balance for sync
+      const todayStr = getLocalDateString();
+      const { data: balData } = await supabase
+        .from('daily_balance')
+        .select('*')
+        .eq('date', todayStr)
+        .maybeSingle();
+
+      if (balData) {
+        const bal: DailyBalance = {
+          date: balData.date,
+          totalStartingBalance: balData.total_starting_balance,
+          usedToday: balData.used_today
+        };
+        setDailyBalance(bal);
+        localStorage.setItem('zen_dailyBalance', JSON.stringify(bal));
       }
     } catch (e) {
-      console.warn('Could not sync requests from Supabase:', e);
+      console.warn('Could not sync with Supabase:', e);
     }
   };
 
@@ -196,10 +284,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     if (!currentUser) return;
 
-    fetchDbRequests();
+    fetchDbData();
 
     const pollInterval = setInterval(() => {
-      fetchDbRequests();
+      fetchDbData();
     }, 3000);
 
     const channel = supabase
@@ -207,9 +295,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'requests' },
-        () => {
-          fetchDbRequests();
-        }
+        () => fetchDbData()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'daily_balance' },
+        () => fetchDbData()
       )
       .subscribe();
 
@@ -259,6 +350,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
       
       localStorage.setItem('zen_dailyBalance', JSON.stringify(newBalance));
+      syncDailyBalanceWithSupabase(newBalance);
       return newBalance;
     });
   }, [currentUser]);
@@ -345,7 +437,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           alert('Aviso Supabase: ' + error.message);
         }
       } else {
-        fetchDbRequests();
+        fetchDbData();
       }
     } catch (e: any) {
       console.error('Could not save request to Supabase:', e);
@@ -382,7 +474,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (error) {
         console.warn('Supabase update request error:', error.message);
       } else {
-        fetchDbRequests();
+        fetchDbData();
       }
     } catch (e) {
       console.warn('Could not update request in Supabase:', e);
@@ -415,6 +507,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         usedToday: prev.usedToday + durationConsumed
       };
       localStorage.setItem('zen_dailyBalance', JSON.stringify(updated));
+      syncDailyBalanceWithSupabase(updated);
       return updated;
     });
 

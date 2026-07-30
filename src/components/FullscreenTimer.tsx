@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Square, Pause, Play } from 'lucide-react';
-import { playZenGong } from '../utils/audioEngine';
+import { playZenGong, playNotificationChime } from '../utils/audioEngine';
 import { formatTime } from '../utils/timeEngine';
 import { MassageRequest } from '../types';
 
@@ -70,6 +70,16 @@ export const FullscreenTimer: React.FC<FullscreenTimerProps> = ({ request, onFin
 
   const handleComplete = () => {
     playZenGong();
+    playNotificationChime();
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([300, 150, 300, 150, 500]);
+    }
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+      new Notification('🌿 ¡Tiempo completado!', {
+        body: 'Tu sesión de masaje ha finalizado.',
+        icon: '/pwa-icon.png'
+      });
+    }
     calculateAndFinish();
   };
 

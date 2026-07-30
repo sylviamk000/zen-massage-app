@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Check, Bell, BellOff } from 'lucide-react';
+import { Check, Bell, BellOff, LogOut, RotateCcw } from 'lucide-react';
 
 export const SettingsView: React.FC = () => {
-  const { currentUser, updateProfile, requestNotificationPermission, notificationsEnabled } = useAppContext();
+  const { currentUser, updateProfile, requestNotificationPermission, notificationsEnabled, logout, resetApp } = useAppContext();
   const [name, setName] = useState(currentUser?.name || '');
   const [emoji, setEmoji] = useState(currentUser?.avatar_emoji || '🐻');
   const [saved, setSaved] = useState(false);
@@ -17,7 +17,7 @@ export const SettingsView: React.FC = () => {
   return (
     <div className="fade-in" style={{ padding: '0 1.25rem 2rem 1.25rem', maxWidth: '580px', margin: '0 auto' }}>
       <h2 style={{ fontSize: '1.5rem', marginBottom: '1.25rem', color: 'var(--zen-forest-dark)' }}>
-        Ajustes de Perfil
+        Mi Perfil
       </h2>
 
       <div className="zen-card" style={{ background: 'var(--zen-bg-card)', display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '1.5rem' }}>
@@ -71,14 +71,23 @@ export const SettingsView: React.FC = () => {
           </div>
         </div>
 
-        <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--zen-border-subtle)' }}>
+        <button 
+          className="zen-button primary" 
+          onClick={handleSave}
+          style={{ marginTop: '0.25rem' }}
+        >
+          {saved ? <><Check size={18} /> ¡Guardado!</> : 'Guardar Cambios'}
+        </button>
+
+        {/* NOTIFICACIONES SECTION */}
+        <div style={{ paddingTop: '1.25rem', borderTop: '1px solid var(--zen-border-subtle)' }}>
           <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--zen-forest-medium)', marginBottom: '8px', letterSpacing: '0.04em' }}>
             NOTIFICACIONES AL MÓVIL
           </label>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--zen-bg-card-alt)', padding: '12px 16px', borderRadius: '14px', border: '1px solid var(--zen-border)' }}>
             <span style={{ fontSize: '0.9rem', color: 'var(--zen-text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
               {notificationsEnabled ? <Bell size={18} color="var(--zen-forest-dark)" /> : <BellOff size={18} color="var(--zen-text-muted)" />}
-              {notificationsEnabled ? 'Notificaciones de móvil activas' : 'Notificaciones inactivas'}
+              {notificationsEnabled ? 'Notificaciones activadas' : 'Notificaciones desactivadas'}
             </span>
             <button
               onClick={requestNotificationPermission}
@@ -90,13 +99,32 @@ export const SettingsView: React.FC = () => {
           </div>
         </div>
 
-        <button 
-          className="zen-button primary" 
-          onClick={handleSave}
-          style={{ marginTop: '0.5rem' }}
-        >
-          {saved ? <><Check size={18} /> ¡Guardado!</> : 'Guardar Cambios'}
-        </button>
+        {/* REINICIAR APLICACIÓN (SÓLO DENTRO DEL PERFIL DEL GNOMO) */}
+        {currentUser?.role === 'masajista' && (
+          <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--zen-border-subtle)' }}>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--zen-forest-medium)', marginBottom: '8px', letterSpacing: '0.04em' }}>
+              ADMINISTRACIÓN GNOMO
+            </label>
+            <button 
+              onClick={resetApp}
+              className="zen-button danger"
+              style={{ width: '100%', padding: '12px', gap: '6px', fontSize: '0.9rem' }}
+            >
+              <RotateCcw size={16} /> Reiniciar aplicación y datos
+            </button>
+          </div>
+        )}
+
+        {/* CERRAR SESIÓN */}
+        <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--zen-border-subtle)' }}>
+          <button 
+            onClick={logout}
+            className="zen-button secondary"
+            style={{ width: '100%', padding: '12px', gap: '6px', color: '#B91C1C', borderColor: 'rgba(185, 28, 28, 0.2)' }}
+          >
+            <LogOut size={16} /> Cerrar sesión
+          </button>
+        </div>
 
       </div>
     </div>

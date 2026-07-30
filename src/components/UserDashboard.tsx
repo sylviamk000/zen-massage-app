@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { FullscreenTimer } from './FullscreenTimer';
-import { Clock, RefreshCw, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Clock, RefreshCw, CheckCircle2, Sliders } from 'lucide-react';
 
 export const UserDashboard: React.FC = () => {
   const { dailyBalance, requests, history, createRequest, updateRequestStatus, recordSession } = useAppContext();
@@ -11,6 +11,8 @@ export const UserDashboard: React.FC = () => {
   
   const [showRatingScreen, setShowRatingScreen] = useState<string | null>(null);
   const [rating, setRating] = useState<number>(5);
+
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   if (!dailyBalance) {
     return (
@@ -30,6 +32,10 @@ export const UserDashboard: React.FC = () => {
     createRequest(requestMinutes, requestNote);
     setShowRequestForm(false);
     setRequestNote('');
+
+    // Floating toast message that disappears after 3 seconds
+    setToastMessage('Petición enviada a Gnomo 🍄');
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   const handleStartSession = () => {
@@ -53,43 +59,68 @@ export const UserDashboard: React.FC = () => {
     }
   };
 
-  // Rating Overlay Screen
+  // Ultra-responsive Rating Overlay Modal
   if (showRatingScreen) {
     return (
       <div className="fade-in" style={{
-        position: 'fixed', inset: 0, background: 'var(--zen-bg)', 
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        zIndex: 100, padding: '2rem'
+        position: 'fixed', inset: 0, 
+        background: 'rgba(21, 32, 23, 0.82)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 200, padding: '1rem'
       }}>
-        <div className="zen-card" style={{ maxWidth: '420px', width: '100%', textAlign: 'center', padding: '2.5rem 1.5rem' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✨</div>
-          <h2 style={{ fontSize: '1.8rem', marginBottom: '0.5rem', color: 'var(--zen-forest-dark)' }}>¿Qué tal tu masaje?</h2>
-          <p style={{ color: 'var(--zen-text-muted)', fontSize: '0.95rem', marginBottom: '2rem' }}>
-            Valora tu sesión para guardarla en tu historial
+        <div className="zen-card" style={{ 
+          maxWidth: '400px', 
+          width: '92%', 
+          textAlign: 'center', 
+          padding: '2rem 1.25rem',
+          background: 'var(--zen-bg-card)',
+          borderRadius: '28px',
+          boxShadow: '0 24px 48px rgba(0, 0, 0, 0.3)',
+          border: '1.5px solid var(--zen-border)'
+        }}>
+          <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🐻✨</div>
+          <h2 style={{ fontSize: '1.6rem', margin: '0 0 0.5rem 0', color: 'var(--zen-forest-dark)', fontWeight: 600 }}>
+            ¿Qué tal tu masaje?
+          </h2>
+          <p style={{ color: 'var(--zen-text-muted)', fontSize: '0.9rem', margin: '0 0 1.75rem 0', lineHeight: 1.4 }}>
+            Valora tu sesión de masaje para guardarla en tu historial zen
           </p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '2.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px', marginBottom: '2rem' }}>
             {[1, 2, 3, 4, 5].map(val => (
               <button
                 key={val} 
                 onClick={() => setRating(val)}
                 style={{ 
-                  background: 'none',
-                  border: 'none',
-                  fontSize: '2.8rem', 
+                  background: val <= rating ? 'var(--zen-forest-light)' : 'var(--zen-bg-card-alt)',
+                  border: val <= rating ? '2px solid var(--zen-forest-dark)' : '1px solid var(--zen-border)',
+                  borderRadius: '16px',
+                  fontSize: '2rem', 
                   cursor: 'pointer',
-                  opacity: val <= rating ? 1 : 0.25,
-                  transform: val === rating ? 'scale(1.2)' : 'scale(1)',
+                  padding: '12px 2px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: val <= rating ? 1 : 0.4,
+                  transform: val === rating ? 'scale(1.08)' : 'scale(1)',
                   transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                  padding: 0
+                  width: '100%',
+                  boxSizing: 'border-box'
                 }}
+                title={`${val} Oso${val !== 1 ? 's' : ''}`}
               >
                 🐻
               </button>
             ))}
           </div>
 
-          <button className="zen-button primary" onClick={submitRating}>
+          <div style={{ marginBottom: '1.5rem', fontSize: '0.95rem', fontWeight: 600, color: 'var(--zen-forest-dark)' }}>
+            Valoración: {rating} / 5 🐻
+          </div>
+
+          <button className="zen-button primary" onClick={submitRating} style={{ width: '100%', padding: '16px' }}>
             Guardar Valoración
           </button>
         </div>
@@ -108,8 +139,32 @@ export const UserDashboard: React.FC = () => {
   }
 
   return (
-    <div className="fade-in" style={{ padding: '0 1.25rem 2rem 1.25rem', maxWidth: '580px', margin: '0 auto' }}>
+    <div className="fade-in" style={{ padding: '0 1.25rem 2rem 1.25rem', maxWidth: '580px', margin: '0 auto', position: 'relative' }}>
       
+      {/* Toast Notification message at bottom */}
+      {toastMessage && (
+        <div className="fade-in" style={{
+          position: 'fixed',
+          bottom: '85px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'var(--zen-forest-dark)',
+          color: '#FFFFFF',
+          padding: '12px 22px',
+          borderRadius: '24px',
+          boxShadow: '0 12px 28px rgba(0,0,0,0.25)',
+          zIndex: 1000,
+          fontSize: '0.95rem',
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          border: '1px solid rgba(255,255,255,0.2)'
+        }}>
+          <span>✨</span> {toastMessage}
+        </div>
+      )}
+
       {/* Hero Stats Card */}
       <div className="zen-card-hero" style={{ marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -221,10 +276,11 @@ export const UserDashboard: React.FC = () => {
           </div>
           
           <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--zen-forest-medium)', marginBottom: '10px', letterSpacing: '0.04em' }}>
-            SELECCIONA DURACIÓN ({requestMinutes} MIN)
+            DURACIÓN DEL MASAJE ({requestMinutes} MIN)
           </label>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '1.25rem' }}>
+          {/* Quick Selector Buttons */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '10px' }}>
             {[5, 10, 15, 20].map(val => {
               const isDisabled = val > remainingMinutes;
               const isSelected = requestMinutes === val;
@@ -234,9 +290,9 @@ export const UserDashboard: React.FC = () => {
                   type="button"
                   className={`zen-button ${isSelected ? 'primary' : 'secondary'}`}
                   style={{ 
-                    padding: '12px 6px', 
-                    fontSize: '0.95rem', 
-                    borderRadius: '14px',
+                    padding: '10px 4px', 
+                    fontSize: '0.9rem', 
+                    borderRadius: '12px',
                     ...(isSelected && { border: 'none' })
                   }}
                   onClick={() => setRequestMinutes(val)}
@@ -246,6 +302,26 @@ export const UserDashboard: React.FC = () => {
                 </button>
               );
             })}
+          </div>
+
+          {/* Custom Time Range Controller */}
+          <div style={{ background: 'var(--zen-bg-card-alt)', padding: '12px 16px', borderRadius: '16px', border: '1px solid var(--zen-border)', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--zen-text-muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Sliders size={14} /> Ajustar tiempo exacto:
+              </span>
+              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--zen-forest-dark)' }}>
+                {requestMinutes} min
+              </span>
+            </div>
+            <input 
+              type="range" 
+              min="1" 
+              max={Math.max(1, remainingMinutes)} 
+              value={requestMinutes}
+              onChange={(e) => setRequestMinutes(Number(e.target.value))}
+              style={{ width: '100%', accentColor: 'var(--zen-amber)', cursor: 'pointer' }}
+            />
           </div>
 
           <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--zen-forest-medium)', marginBottom: '8px', letterSpacing: '0.04em' }}>
