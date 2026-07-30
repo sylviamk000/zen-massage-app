@@ -65,7 +65,7 @@ function App() {
           currentUser.role === 'masajista' ? <AdminDashboard /> : <UserDashboard />
         ) : activeTab === 'history' ? (
           <HistoryView />
-        ) : activeTab === 'achievements' ? (
+        ) : activeTab === 'achievements' && currentUser.role === 'masajista' ? (
           <AchievementsView />
         ) : (
           <SettingsView />
@@ -112,20 +112,23 @@ function App() {
           <span style={{ fontSize: '0.75rem' }}>Historial</span>
         </button>
 
-        <button 
-          onClick={() => setActiveTab('achievements')}
-          style={{ 
-            background: 'none', border: 'none', 
-            color: activeTab === 'achievements' ? 'var(--zen-amber)' : 'var(--zen-text-muted)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
-            cursor: 'pointer',
-            fontFamily: 'var(--font-sans)',
-            fontWeight: activeTab === 'achievements' ? 600 : 400
-          }}
-        >
-          <Trophy size={22} />
-          <span style={{ fontSize: '0.75rem' }}>Logros</span>
-        </button>
+        {/* LOGROS (SÓLO VISIBLE Y ACCESIBLE PARA EL GNOMO) */}
+        {currentUser.role === 'masajista' && (
+          <button 
+            onClick={() => setActiveTab('achievements')}
+            style={{ 
+              background: 'none', border: 'none', 
+              color: activeTab === 'achievements' ? 'var(--zen-amber)' : 'var(--zen-text-muted)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-sans)',
+              fontWeight: activeTab === 'achievements' ? 600 : 400
+            }}
+          >
+            <Trophy size={22} />
+            <span style={{ fontSize: '0.75rem' }}>Logros</span>
+          </button>
+        )}
 
         <button 
           onClick={() => setActiveTab('settings')}
