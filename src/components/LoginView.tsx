@@ -57,7 +57,20 @@ export const LoginView: React.FC<LoginViewProps> = ({ onDemoLogin }) => {
       background: 'var(--zen-bg)'
     }}>
       <div className="zen-card" style={{ maxWidth: '420px', width: '100%', padding: '2.5rem 1.75rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>🐻 🌿 🍄</div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
+          <img 
+            src="/pwa-icon.png" 
+            alt="Zen Massage Logo" 
+            style={{ 
+              width: '88px', 
+              height: '88px', 
+              borderRadius: '26px', 
+              boxShadow: '0 12px 30px rgba(0,0,0,0.25)',
+              border: '2px solid var(--zen-amber)',
+              objectFit: 'cover'
+            }} 
+          />
+        </div>
         
         <h1 style={{ fontSize: '1.8rem', color: 'var(--zen-forest-dark)', marginBottom: '0.5rem' }}>
           Zen Zen Regulado

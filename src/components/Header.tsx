@@ -17,13 +17,27 @@ export const Header: React.FC = () => {
       width: '100%',
       zIndex: 10
     }}>
-      <div>
-        <h1 style={{ margin: '0 0 2px 0', fontSize: '1.65rem', fontWeight: 600, color: 'var(--zen-forest-dark)' }}>
-          Hola, {currentUser.name} {currentUser.avatar_emoji}
-        </h1>
-        <p style={{ margin: 0, color: 'var(--zen-text-muted)', fontSize: '0.85rem', fontWeight: 500 }}>
-          {currentUser.role === 'cliente' ? '¿Te apetece un masaje hoy?' : 'Panel de administración zen'}
-        </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <img 
+          src="/pwa-icon.png" 
+          alt="Zen Logo" 
+          style={{ 
+            width: '46px', 
+            height: '46px', 
+            borderRadius: '14px', 
+            boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
+            border: '1.5px solid var(--zen-border)',
+            objectFit: 'cover'
+          }} 
+        />
+        <div>
+          <h1 style={{ margin: '0 0 2px 0', fontSize: '1.55rem', fontWeight: 600, color: 'var(--zen-forest-dark)' }}>
+            Hola, {currentUser.name} {currentUser.avatar_emoji}
+          </h1>
+          <p style={{ margin: 0, color: 'var(--zen-text-muted)', fontSize: '0.85rem', fontWeight: 500 }}>
+            {currentUser.role === 'cliente' ? '¿Te apetece un masaje hoy?' : 'Panel de administración zen'}
+          </p>
+        </div>
       </div>
     </header>
   );
