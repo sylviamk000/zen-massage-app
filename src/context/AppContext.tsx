@@ -4,6 +4,8 @@ import { DailyBalance, getLocalDateString, calculateNewDayBalance } from '../uti
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { playNotificationChime } from '../utils/audioEngine';
 
+import { APP_VERSION, APP_UPDATE_NOTES } from '../version';
+
 interface AppState {
   currentUser: User | null;
   dailyBalance: DailyBalance | null;
@@ -19,6 +21,8 @@ interface AppState {
   setDemoUser: (role: 'cliente' | 'masajista') => void;
   requestNotificationPermission: () => void;
   notificationsEnabled: boolean;
+  updateBannerMessage: string | null;
+  dismissUpdateBanner: () => void;
 }
 
 const defaultUser: User = { id: 'u1', name: 'Mataosos', role: 'cliente', avatar_emoji: '🐻' };
@@ -38,7 +42,9 @@ const defaultState: AppState = {
   resetApp: () => {},
   setDemoUser: () => {},
   requestNotificationPermission: () => {},
-  notificationsEnabled: false
+  notificationsEnabled: false,
+  updateBannerMessage: null,
+  dismissUpdateBanner: () => {}
 };
 
 const AppContext = createContext<AppState>(defaultState);
@@ -565,6 +571,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     window.location.reload();
   };
 
+  const [updateBannerMessage, setUpdateBannerMessage] = useState<string | null>(null);
+
+  // Auto-detect new app updates on startup
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const lastSeenVersion = localStorage.getItem('zen_app_version');
+    if (lastSeenVersion !== APP_VERSION) {
+      // 1. Send system OS push notification
+      sendSystemNotification(
+        '✨ ¡Zen Masajes Actualizado!',
+        `Versión ${APP_VERSION}: ${APP_UPDATE_NOTES}`
+      );
+
+      // 2. Set in-app notification banner
+      setUpdateBannerMessage(`✨ ¡Novedad v${APP_VERSION}! ${APP_UPDATE_NOTES}`);
+      localStorage.setItem('zen_app_version', APP_VERSION);
+    }
+  }, [currentUser]);
+
+  const dismissUpdateBanner = () => setUpdateBannerMessage(null);
+
   return (
     <AppContext.Provider value={{
       currentUser,
@@ -580,7 +608,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       resetApp,
       setDemoUser,
       requestNotificationPermission,
-      notificationsEnabled
+      notificationsEnabled,
+      updateBannerMessage,
+      dismissUpdateBanner
     }}>
       {children}
     </AppContext.Provider>

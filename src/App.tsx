@@ -6,10 +6,10 @@ import { HistoryView } from './components/HistoryView';
 import { SettingsView } from './components/SettingsView';
 import { LoginView } from './components/LoginView';
 import { useAppContext } from './context/AppContext';
-import { Clock, Home, User as UserIcon } from 'lucide-react';
+import { Clock, Home, User as UserIcon, Sparkles, X } from 'lucide-react';
 
 function App() {
-  const { currentUser, setDemoUser } = useAppContext();
+  const { currentUser, setDemoUser, updateBannerMessage, dismissUpdateBanner } = useAppContext();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'settings'>('dashboard');
 
   if (!currentUser) {
@@ -18,6 +18,45 @@ function App() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Top Floating App Update Notification Banner */}
+      {updateBannerMessage && (
+        <div style={{
+          background: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)',
+          color: '#FFFFFF',
+          padding: '10px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: '0.85rem',
+          fontWeight: 600,
+          boxShadow: '0 4px 14px rgba(249, 115, 22, 0.35)',
+          zIndex: 100
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingRight: '12px' }}>
+            <Sparkles size={18} style={{ flexShrink: 0 }} />
+            <span>{updateBannerMessage}</span>
+          </div>
+          <button 
+            onClick={dismissUpdateBanner}
+            style={{ 
+              background: 'rgba(255,255,255,0.2)', 
+              border: 'none', 
+              color: '#FFFFFF', 
+              cursor: 'pointer',
+              borderRadius: '50%',
+              width: '24px',
+              height: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
       <Header />
       
       <main style={{ flex: 1, overflowY: 'auto' }}>
