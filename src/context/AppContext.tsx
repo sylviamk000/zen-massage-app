@@ -65,6 +65,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   });
 
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(() => {
+    const saved = localStorage.getItem('zen_notifications_enabled');
+    if (saved !== null) {
+      return saved === 'true';
+    }
     return typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted';
   });
 
@@ -80,17 +84,30 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, []);
 
-  const requestNotificationPermission = async () => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        setNotificationsEnabled(true);
+  const toggleNotifications = async () => {
+    if (!notificationsEnabled) {
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          setNotificationsEnabled(true);
+          localStorage.setItem('zen_notifications_enabled', 'true');
+        } else {
+          setNotificationsEnabled(false);
+          localStorage.setItem('zen_notifications_enabled', 'false');
+        }
       }
+    } else {
+      setNotificationsEnabled(false);
+      localStorage.setItem('zen_notifications_enabled', 'false');
     }
   };
 
+  const requestNotificationPermission = toggleNotifications;
+
   // Helper to send cross-device system notifications
   const sendSystemNotification = async (title: string, body: string) => {
+    if (!notificationsEnabled) return;
+
     playNotificationChime();
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
       navigator.vibrate([200, 100, 200, 100, 400]);
@@ -101,13 +118,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         const reg = await navigator.serviceWorker.ready;
         reg.showNotification(title, {
           body,
-          icon: '/pwa-icon.png',
-          badge: '/pwa-icon.png'
+          icon: '/pwa-icon.svg',
+          badge: '/pwa-icon.svg'
         });
       } catch (e) {
         new Notification(title, {
           body,
-          icon: '/pwa-icon.png'
+          icon: '/pwa-icon.svg'
         });
       }
     }
