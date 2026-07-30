@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Lock, Mail, Sparkles, AlertCircle } from 'lucide-react';
+import { Lock, Mail, AlertCircle } from 'lucide-react';
 
 interface LoginViewProps {
   onDemoLogin: (role: 'cliente' | 'masajista') => void;

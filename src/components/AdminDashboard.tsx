@@ -115,19 +115,21 @@ export const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Rejection Reason Modal (PERFECTLY CENTERED SCREEN OVERLAY) */}
+      {/* Rejection Reason Modal (Positioned Higher for Optimal UX) */}
       {rejectModalReqId && (
         <div className="fade-in" style={{
           position: 'fixed', 
           top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(21, 32, 23, 0.85)',
+          background: 'rgba(16, 23, 18, 0.85)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           display: 'flex', 
-          alignItems: 'center', 
+          alignItems: 'flex-start', 
           justifyContent: 'center',
           zIndex: 9999, 
-          padding: '1.25rem'
+          padding: '1.25rem',
+          paddingTop: '3.5rem',
+          overflowY: 'auto'
         }}>
           <div className="zen-card fade-in" style={{ 
             maxWidth: '380px', 
@@ -135,9 +137,9 @@ export const AdminDashboard: React.FC = () => {
             padding: '1.75rem 1.25rem',
             background: 'var(--zen-bg-card)',
             borderRadius: '28px',
-            boxShadow: '0 24px 48px rgba(0, 0, 0, 0.35)',
+            boxShadow: '0 24px 48px rgba(0, 0, 0, 0.45)',
             border: '1.5px solid var(--zen-border)',
-            margin: 'auto'
+            margin: '0 auto'
           }}>
             <h3 style={{ margin: '0 0 8px 0', color: 'var(--zen-forest-dark)', fontSize: '1.3rem', textAlign: 'center' }}>
               Motivo del rechazo
@@ -211,8 +213,8 @@ export const AdminDashboard: React.FC = () => {
           style={{
             flex: 1, padding: '10px', borderRadius: '14px', border: 'none',
             fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer',
-            background: activeSubTab === 'overview' ? 'var(--zen-forest-dark)' : 'transparent',
-            color: activeSubTab === 'overview' ? '#FFFFFF' : 'var(--zen-text-muted)',
+            background: activeSubTab === 'overview' ? 'var(--zen-forest-medium)' : 'transparent',
+            color: activeSubTab === 'overview' ? 'var(--zen-bg-card)' : 'var(--zen-text-muted)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
             transition: 'all 0.2s ease-in-out'
           }}
@@ -225,8 +227,8 @@ export const AdminDashboard: React.FC = () => {
           style={{
             flex: 1, padding: '10px', borderRadius: '14px', border: 'none',
             fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer',
-            background: activeSubTab === 'metrics' ? 'var(--zen-forest-dark)' : 'transparent',
-            color: activeSubTab === 'metrics' ? '#FFFFFF' : 'var(--zen-text-muted)',
+            background: activeSubTab === 'metrics' ? 'var(--zen-forest-medium)' : 'transparent',
+            color: activeSubTab === 'metrics' ? 'var(--zen-bg-card)' : 'var(--zen-text-muted)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
             transition: 'all 0.2s ease-in-out'
           }}

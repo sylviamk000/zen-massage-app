@@ -270,7 +270,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         const bal: DailyBalance = {
           date: balData.date,
           totalStartingBalance: balData.total_starting_balance,
-          usedToday: balData.used_today
+          usedToday: balData.used_today,
+          baseQuota: balData.base_quota || 20,
+          unusedFromYesterday: balData.unused_from_yesterday || 0
         };
         setDailyBalance(bal);
         localStorage.setItem('zen_dailyBalance', JSON.stringify(bal));

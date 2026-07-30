@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const rawUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const rawUrl = (import.meta as any).env?.VITE_SUPABASE_URL || '';
+const rawKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || '';
 
 // Automatically extract ONLY protocol + domain (e.g. https://xyz.supabase.co)
 // even if user pasted extra slashes or /rest/v1 in Vercel!

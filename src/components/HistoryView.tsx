@@ -38,7 +38,7 @@ export const HistoryView: React.FC = () => {
 
       {filteredHistory.length === 0 ? (
         <div style={{ textAlign: 'center', color: 'var(--zen-text-muted)', padding: '2rem 0', background: 'var(--zen-bg-card)', borderRadius: '20px' }}>
-          {currentUser.role === 'cliente' 
+          {currentUser?.role === 'cliente' 
             ? 'Aún no has disfrutado ningún masaje.\nPide el primero'
             : 'Todavía no has dado ningún masaje.'}
         </div>

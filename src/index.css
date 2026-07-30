@@ -36,35 +36,35 @@
   --font-sans: 'Sora', sans-serif;
 }
 
-/* Dark Mode Overrides */
+/* Dark Mode Overrides - Cozy, Warm & High Contrast */
 body.dark-mode {
-  --zen-bg: #121914;
-  --zen-bg-card: #1B261D;
-  --zen-bg-card-alt: #233126;
-  --zen-bg-subtle: #2C3C2F;
+  --zen-bg: #101712;
+  --zen-bg-card: #18221B;
+  --zen-bg-card-alt: #202B23;
+  --zen-bg-subtle: #29372C;
   
-  --zen-text-main: #F3F6F4;
-  --zen-text-muted: #9EB0A1;
-  --zen-text-light: #768879;
+  --zen-text-main: #F4F7F5;
+  --zen-text-muted: #A7B8AA;
+  --zen-text-light: #7E9182;
   
-  --zen-forest-dark: #81E6BB;
+  --zen-forest-dark: #6EE7B7;
   --zen-forest-medium: #34D399;
-  --zen-forest-light: #1F3628;
+  --zen-forest-light: #1C3325;
   
-  --zen-amber: #F97316;
-  --zen-amber-light: #3D2210;
+  --zen-amber: #F59E0B;
+  --zen-amber-light: #332312;
   
-  --zen-sage-light: #273A2B;
-  --zen-border: #2D3E30;
-  --zen-border-subtle: #243327;
+  --zen-sage-light: #25382B;
+  --zen-border: #2C3D30;
+  --zen-border-subtle: #223227;
 
-  --status-pending-bg: #451A03;
-  --status-pending-text: #FDE68A;
+  --status-pending-bg: #3D2210;
+  --status-pending-text: #FCD34D;
   
-  --status-approved-bg: #064E3B;
-  --status-approved-text: #A7F3D0;
+  --status-approved-bg: #113D2C;
+  --status-approved-text: #6EE7B7;
   
-  --status-rejected-bg: #7F1D1D;
+  --status-rejected-bg: #3D1A1A;
   --status-rejected-text: #FCA5A5;
 }
 
@@ -134,7 +134,20 @@ body {
 }
 
 body.dark-mode .zen-button {
-  color: #121914;
+  background: var(--zen-forest-medium);
+  color: #101712 !important;
+}
+
+body.dark-mode .zen-button.secondary {
+  background: var(--zen-bg-card-alt);
+  color: var(--zen-text-main);
+  border: 1.5px solid var(--zen-border);
+}
+
+body.dark-mode .zen-button.danger {
+  background: var(--status-rejected-bg);
+  color: var(--status-rejected-text) !important;
+  border: 1.5px solid rgba(252, 165, 165, 0.3);
 }
 
 .zen-button:hover {
