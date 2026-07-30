@@ -155,28 +155,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onDemoLogin }) => {
             {loading ? 'Entrando...' : 'Iniciar Sesión'}
           </button>
         </form>
-
-        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--zen-border-subtle)' }}>
-          <p style={{ fontSize: '0.8rem', color: 'var(--zen-text-muted)', marginBottom: '10px' }}>
-            Acceso directo rápido:
-          </p>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button
-              className="zen-button secondary"
-              onClick={() => onDemoLogin('cliente')}
-              style={{ flex: 1, padding: '10px', fontSize: '0.85rem' }}
-            >
-              🐻 Mataosos
-            </button>
-            <button
-              className="zen-button secondary"
-              onClick={() => onDemoLogin('masajista')}
-              style={{ flex: 1, padding: '10px', fontSize: '0.85rem' }}
-            >
-              🍄 Gnomo
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
