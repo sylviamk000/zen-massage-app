@@ -44,8 +44,20 @@ export const FullscreenTimer: React.FC<FullscreenTimerProps> = ({ request, onFin
 
     requestAnimRef.current = requestAnimationFrame(updateTimer);
 
+    // Schedule backup timeout to ensure notification fires even when phone screen is locked
+    let timerTimeout: NodeJS.Timeout | null = null;
+    if (!isPaused) {
+      const remainingMs = endTime - Date.now();
+      if (remainingMs > 0) {
+        timerTimeout = setTimeout(() => {
+          handleComplete();
+        }, remainingMs);
+      }
+    }
+
     return () => {
       if (requestAnimRef.current) cancelAnimationFrame(requestAnimRef.current);
+      if (timerTimeout) clearTimeout(timerTimeout);
     };
   }, [endTime, isPaused]);
 
@@ -75,10 +87,29 @@ export const FullscreenTimer: React.FC<FullscreenTimerProps> = ({ request, onFin
       navigator.vibrate([300, 150, 300, 150, 500]);
     }
     if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-      new Notification('🌿 ¡Tiempo completado!', {
+      const options = {
         body: 'Tu sesión de masaje ha finalizado.',
-        icon: '/pwa-icon.png'
-      });
+        icon: '/pwa-icon.png',
+        badge: '/pwa-icon.png',
+        vibrate: [300, 150, 300, 150, 500],
+        tag: 'zen-timer-complete-' + Date.now(),
+        renotify: true,
+        requireInteraction: true
+      };
+
+      try {
+        navigator.serviceWorker.ready.then(reg => {
+          if (reg && reg.showNotification) {
+            reg.showNotification('🌿 ¡Tiempo completado!', options);
+          }
+        });
+      } catch (e) {
+        try {
+          new Notification('🌿 ¡Tiempo completado!', options);
+        } catch (err) {
+          console.warn('Timer notification error:', err);
+        }
+      }
     }
     calculateAndFinish();
   };
