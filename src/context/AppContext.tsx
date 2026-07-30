@@ -85,21 +85,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         setNotificationsEnabled(true);
-        playNotificationChime();
-        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-        
-        try {
-          const reg = await navigator.serviceWorker.ready;
-          reg.showNotification('🌿 Zen Masajes', {
-            body: '¡Notificaciones activadas con éxito!',
-            icon: '/pwa-icon.png'
-          });
-        } catch (e) {
-          new Notification('🌿 Zen Masajes', {
-            body: '¡Notificaciones activadas con éxito!',
-            icon: '/pwa-icon.png'
-          });
-        }
       }
     }
   };

@@ -10,8 +10,11 @@ export const SettingsView: React.FC = () => {
 
   // Dark Mode State
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    return localStorage.getItem('zen_dark_mode') === 'true' || 
-      (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const saved = localStorage.getItem('zen_dark_mode');
+    if (saved !== null) {
+      return saved === 'true';
+    }
+    return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
   useEffect(() => {
@@ -33,8 +36,6 @@ export const SettingsView: React.FC = () => {
   const handleToggleNotifications = () => {
     if (!notificationsEnabled) {
       requestNotificationPermission();
-    } else {
-      alert('ℹ️ Para desactivar notificaciones por completo, puedes desactivar los permisos en los ajustes de tu navegador o móvil.');
     }
   };
 
