@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F1712"/>
+      <stop offset="100%" stop-color="#1C2D22"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="50%" stop-color="#E2C799"/>
+      <stop offset="100%" stop-color="#D97724"/>
+    </linearGradient>
+    <linearGradient id="duneGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E2C799" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#D97724" stop-opacity="0.65"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Squircle Base -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" stroke="#2D3D30" stroke-width="8"/>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-opacity="0.4"/>
+
+  <!-- Sun Gran Canaria -->
+  <circle cx="370" cy="130" r="48" fill="url(#goldGrad)" opacity="0.9"/>
+  <circle cx="370" cy="130" r="68" fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-opacity="0.3" stroke-dasharray="8 6"/>
+
+  <!-- Maspalomas Dunes Curves -->
+  <path d="M 0 330 Q 180 250, 330 310 T 512 320 L 512 512 L 0 512 Z" fill="url(#duneGrad)"/>
+  <path d="M 0 375 Q 220 305, 512 355 L 512 512 L 0 512 Z" fill="#18241B"/>
+  <path d="M 0 330 Q 180 250, 330 310 T 512 320" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+
+  <!-- Ocean Waves -->
+  <path d="M 270 425 Q 330 405, 410 425 T 512 415" fill="none" stroke="#8BA88E" stroke-width="3" opacity="0.6"/>
+
+  <!-- Palm Tree -->
+  <path d="M 440 370 Q 415 250, 465 170" fill="none" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+  <!-- Palm Leaves -->
+  <path d="M 465 170 Q 395 150, 355 180 M 465 170 Q 425 120, 385 110 M 465 170 Q 490 120, 500 95 M 465 170 Q 495 160, 510 170" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Gran Canaria Beach Gnomo -->
+  <g transform="translate(130, 165)">
+    <!-- Gnomo Pointy Hat -->
+    <path d="M 70 5 Q 125 75, 120 145 L 20 145 Q 15 75, 70 5 Z" fill="url(#goldGrad)"/>
+    <path d="M 70 5 Q 128 55, 98 115" fill="none" stroke="#FFF" stroke-width="3.5" stroke-linecap="round" opacity="0.55"/>
+    <!-- Gnomo Nose -->
+    <circle cx="70" cy="145" r="19" fill="#FCD34D"/>
+    <!-- Gnomo Beard -->
+    <path d="M 25 152 Q 70 235, 115 152 Q 135 205, 70 245 Q 5 205, 25 152 Z" fill="#F5F7F4" opacity="0.95"/>
+    <!-- Cool Sunglasses -->
+    <rect x="36" y="137" width="30" height="18" rx="5" fill="#111813"/>
+    <rect x="74" y="137" width="30" height="18" rx="5" fill="#111813"/>
+    <line x1="66" y1="144" x2="74" y2="144" stroke="#111813" stroke-width="4"/>
+  </g>
+</svg>

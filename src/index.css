@@ -36,36 +36,38 @@
   --font-sans: 'Sora', sans-serif;
 }
 
-/* Dark Mode Overrides - Cozy, Warm & High Contrast */
+/* Dark Mode Overrides - Warm, Modern & Cozy Zen */
 body.dark-mode {
-  --zen-bg: #101712;
-  --zen-bg-card: #18221B;
-  --zen-bg-card-alt: #202B23;
-  --zen-bg-subtle: #29372C;
+  --zen-bg: #111813;
+  --zen-bg-card: #19241B;
+  --zen-bg-card-alt: #222E25;
+  --zen-bg-subtle: #2C3A2F;
   
-  --zen-text-main: #F4F7F5;
-  --zen-text-muted: #A7B8AA;
-  --zen-text-light: #7E9182;
+  --zen-text-main: #F5F7F4;
+  --zen-text-muted: #A8B8AA;
+  --zen-text-light: #7E9081;
   
-  --zen-forest-dark: #6EE7B7;
-  --zen-forest-medium: #34D399;
-  --zen-forest-light: #1C3325;
+  /* Accents: Warm Champagne Gold & Organic Sage Green */
+  --zen-forest-dark: #E2C799;
+  --zen-forest-medium: #8BA88E;
+  --zen-forest-light: #203124;
   
-  --zen-amber: #F59E0B;
-  --zen-amber-light: #332312;
+  --zen-amber: #E68A36;
+  --zen-amber-light: #362314;
   
-  --zen-sage-light: #25382B;
-  --zen-border: #2C3D30;
-  --zen-border-subtle: #223227;
+  --zen-sage-light: #283A2C;
+  --zen-border: #2D3D30;
+  --zen-border-subtle: #233226;
 
-  --status-pending-bg: #3D2210;
+  /* Status Colors */
+  --status-pending-bg: #3B2612;
   --status-pending-text: #FCD34D;
   
-  --status-approved-bg: #113D2C;
-  --status-approved-text: #6EE7B7;
+  --status-approved-bg: #1B3322;
+  --status-approved-text: #8BA88E;
   
-  --status-rejected-bg: #3D1A1A;
-  --status-rejected-text: #FCA5A5;
+  --status-rejected-bg: #3B1C1C;
+  --status-rejected-text: #F87171;
 }
 
 body {
@@ -134,8 +136,9 @@ body {
 }
 
 body.dark-mode .zen-button {
-  background: var(--zen-forest-medium);
-  color: #101712 !important;
+  background: #243327;
+  color: var(--zen-text-main) !important;
+  border: 1.5px solid var(--zen-border);
 }
 
 body.dark-mode .zen-button.secondary {

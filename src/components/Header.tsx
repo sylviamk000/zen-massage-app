@@ -19,11 +19,11 @@ export const Header: React.FC = () => {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
         <img 
-          src="/pwa-icon.png" 
+          src="/pwa-icon.svg" 
           alt="Zen Logo" 
           style={{ 
-            width: '46px', 
-            height: '46px', 
+            width: '48px', 
+            height: '48px', 
             borderRadius: '14px', 
             boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
             border: '1.5px solid var(--zen-border)',

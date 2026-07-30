@@ -59,11 +59,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ onDemoLogin }) => {
       <div className="zen-card" style={{ maxWidth: '420px', width: '100%', padding: '2.5rem 1.75rem', textAlign: 'center' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
           <img 
-            src="/pwa-icon.png" 
+            src="/pwa-icon.svg" 
             alt="Zen Massage Logo" 
             style={{ 
-              width: '88px', 
-              height: '88px', 
+              width: '92px', 
+              height: '92px', 
               borderRadius: '26px', 
               boxShadow: '0 12px 30px rgba(0,0,0,0.25)',
               border: '2px solid var(--zen-amber)',

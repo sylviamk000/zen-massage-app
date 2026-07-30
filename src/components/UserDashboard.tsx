@@ -179,7 +179,7 @@ export const UserDashboard: React.FC = () => {
             </span>
             <div style={{ marginTop: '8px' }}>
               <div style={{ fontSize: '1rem', opacity: 0.9, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#6EE7B7' }}></span>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ADE80' }}></span>
                 Acumulado: <strong style={{ color: '#FFFFFF' }}>{dailyBalance.totalStartingBalance} min</strong>
               </div>
               <div style={{ fontSize: '1rem', opacity: 0.9, display: 'flex', alignItems: 'center', gap: '8px' }}>
