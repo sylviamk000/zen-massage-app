@@ -6,11 +6,12 @@ import { HistoryView } from './components/HistoryView';
 import { SettingsView } from './components/SettingsView';
 import { LoginView } from './components/LoginView';
 import { useAppContext } from './context/AppContext';
-import { Clock, Home, User as UserIcon, Sparkles, X } from 'lucide-react';
+import { AchievementsView } from './components/AchievementsView';
+import { Clock, Home, User as UserIcon, Sparkles, X, Trophy } from 'lucide-react';
 
 function App() {
   const { currentUser, setDemoUser, updateBannerMessage, dismissUpdateBanner } = useAppContext();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'achievements' | 'settings'>('dashboard');
 
   if (!currentUser) {
     return <LoginView onDemoLogin={(role) => setDemoUser(role)} />;
@@ -64,6 +65,8 @@ function App() {
           currentUser.role === 'masajista' ? <AdminDashboard /> : <UserDashboard />
         ) : activeTab === 'history' ? (
           <HistoryView />
+        ) : activeTab === 'achievements' ? (
+          <AchievementsView />
         ) : (
           <SettingsView />
         )}
@@ -72,7 +75,7 @@ function App() {
       <nav style={{
         display: 'flex',
         justifyContent: 'space-around',
-        padding: '1rem',
+        padding: '0.85rem 0.5rem',
         backgroundColor: 'var(--zen-bg-card)',
         borderTop: '1px solid var(--zen-border)',
         position: 'sticky',
@@ -83,43 +86,60 @@ function App() {
           onClick={() => setActiveTab('dashboard')}
           style={{ 
             background: 'none', border: 'none', 
-            color: activeTab === 'dashboard' ? 'var(--zen-forest-dark)' : 'var(--zen-text-muted)',
+            color: activeTab === 'dashboard' ? 'var(--zen-amber)' : 'var(--zen-text-muted)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
             cursor: 'pointer',
             fontFamily: 'var(--font-sans)',
             fontWeight: activeTab === 'dashboard' ? 600 : 400
           }}
         >
-          <Home size={24} />
-          <span style={{ fontSize: '0.8rem' }}>Inicio</span>
+          <Home size={22} />
+          <span style={{ fontSize: '0.75rem' }}>Inicio</span>
         </button>
+
         <button 
           onClick={() => setActiveTab('history')}
           style={{ 
             background: 'none', border: 'none', 
-            color: activeTab === 'history' ? 'var(--zen-forest-dark)' : 'var(--zen-text-muted)',
+            color: activeTab === 'history' ? 'var(--zen-amber)' : 'var(--zen-text-muted)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
             cursor: 'pointer',
             fontFamily: 'var(--font-sans)',
             fontWeight: activeTab === 'history' ? 600 : 400
           }}
         >
-          <Clock size={24} />
-          <span style={{ fontSize: '0.8rem' }}>Historial</span>
+          <Clock size={22} />
+          <span style={{ fontSize: '0.75rem' }}>Historial</span>
         </button>
+
+        <button 
+          onClick={() => setActiveTab('achievements')}
+          style={{ 
+            background: 'none', border: 'none', 
+            color: activeTab === 'achievements' ? 'var(--zen-amber)' : 'var(--zen-text-muted)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
+            cursor: 'pointer',
+            fontFamily: 'var(--font-sans)',
+            fontWeight: activeTab === 'achievements' ? 600 : 400
+          }}
+        >
+          <Trophy size={22} />
+          <span style={{ fontSize: '0.75rem' }}>Logros</span>
+        </button>
+
         <button 
           onClick={() => setActiveTab('settings')}
           style={{ 
             background: 'none', border: 'none', 
-            color: activeTab === 'settings' ? 'var(--zen-forest-dark)' : 'var(--zen-text-muted)',
+            color: activeTab === 'settings' ? 'var(--zen-amber)' : 'var(--zen-text-muted)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
             cursor: 'pointer',
             fontFamily: 'var(--font-sans)',
             fontWeight: activeTab === 'settings' ? 600 : 400
           }}
         >
-          <UserIcon size={24} />
-          <span style={{ fontSize: '0.8rem' }}>Perfil</span>
+          <UserIcon size={22} />
+          <span style={{ fontSize: '0.75rem' }}>Perfil</span>
         </button>
       </nav>
     </div>
