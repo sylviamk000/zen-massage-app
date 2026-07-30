@@ -9,21 +9,23 @@ self.addEventListener('activate', (event) => {
 // Handle background messages from main app thread
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
-    const { title, body, icon, badge } = event.data;
+    const { title, body } = event.data;
+    const tag = 'zen-msg-' + Date.now();
     self.registration.showNotification(title, {
       body,
-      icon: icon || '/pwa-icon.png',
-      badge: badge || '/pwa-icon.png',
+      icon: '/pwa-icon.png',
+      badge: '/pwa-icon.png',
       vibrate: [200, 100, 200, 100, 400],
-      tag: 'zen-massage-notification',
-      renotify: true
+      tag,
+      renotify: true,
+      requireInteraction: true
     });
   }
 });
 
 // Handle native Web Push events
 self.addEventListener('push', (event) => {
-  let data = { title: '🌿 Zen Masajes', body: 'Tienes una nueva actualización.' };
+  let data = { title: 'Zen Masajes', body: 'Tienes un nuevo aviso de masaje.' };
   if (event.data) {
     try {
       data = event.data.json();
@@ -32,14 +34,16 @@ self.addEventListener('push', (event) => {
     }
   }
 
+  const tag = 'zen-msg-' + Date.now();
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
       icon: '/pwa-icon.png',
       badge: '/pwa-icon.png',
       vibrate: [200, 100, 200, 100, 400],
-      tag: 'zen-massage-notification',
-      renotify: true
+      tag,
+      renotify: true,
+      requireInteraction: true
     })
   );
 });

@@ -110,7 +110,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const requestNotificationPermission = toggleNotifications;
 
-  // Helper to send cross-device system notifications
+  // Helper to send cross-device system notifications (works outside app & locked screen)
   const sendSystemNotification = async (title: string, body: string) => {
     if (!notificationsEnabled) return;
 
@@ -120,18 +120,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
 
     if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+      const options = {
+        body,
+        icon: '/pwa-icon.png',
+        badge: '/pwa-icon.png',
+        vibrate: [200, 100, 200, 100, 400],
+        tag: 'zen-massage-' + Date.now(),
+        renotify: true,
+        requireInteraction: true
+      };
+
       try {
-        const reg = await navigator.serviceWorker.ready;
-        reg.showNotification(title, {
-          body,
-          icon: '/pwa-icon.svg',
-          badge: '/pwa-icon.svg'
-        });
+        const reg = (await navigator.serviceWorker.getRegistration()) || (await navigator.serviceWorker.ready);
+        if (reg && reg.showNotification) {
+          await reg.showNotification(title, options);
+          return;
+        }
       } catch (e) {
+        console.warn('ServiceWorker showNotification failed:', e);
+      }
+
+      try {
         new Notification(title, {
           body,
-          icon: '/pwa-icon.svg'
+          icon: '/pwa-icon.png'
         });
+      } catch (e) {
+        console.warn('Fallback Notification failed:', e);
       }
     }
   };
