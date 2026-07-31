@@ -167,9 +167,9 @@ export const AdminDashboard: React.FC = () => {
                     borderRadius: '14px',
                     textAlign: 'left',
                     fontSize: '0.9rem',
-                    background: rejectReason === preset ? 'var(--zen-forest-light)' : 'var(--zen-bg-card-alt)',
-                    border: rejectReason === preset ? '2px solid var(--zen-forest-dark)' : '1px solid var(--zen-border)',
-                    color: 'var(--zen-text-main)',
+                    background: rejectReason === preset ? 'var(--zen-amber)' : 'var(--zen-bg-card-alt)',
+                    border: rejectReason === preset ? '2px solid var(--zen-amber)' : '1px solid var(--zen-border)',
+                    color: rejectReason === preset ? '#FFFFFF' : 'var(--zen-text-main)',
                     cursor: 'pointer',
                     fontWeight: rejectReason === preset ? 600 : 400,
                     transition: 'all 0.15s ease'
@@ -349,9 +349,10 @@ export const AdminDashboard: React.FC = () => {
                       <p style={{ 
                         margin: '0 0 16px 0', 
                         fontSize: '0.9rem', 
-                        color: 'var(--zen-forest-dark)', 
+                        color: 'var(--zen-text-main)', 
                         fontStyle: 'italic', 
-                        background: 'rgba(255, 255, 255, 0.7)', 
+                        background: 'var(--zen-bg-card)', 
+                        border: '1px solid var(--zen-border)',
                         padding: '10px 14px', 
                         borderRadius: '12px' 
                       }}>

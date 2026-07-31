@@ -36,38 +36,62 @@
   --font-sans: 'Sora', sans-serif;
 }
 
-/* Dark Mode Overrides - Real Dark (Blacks & Warm Oranges UX/UI) */
+/* Dark Mode Overrides - Warm Dark Zen Palette */
 body.dark-mode {
-  --zen-bg: #0F0F11;
-  --zen-bg-card: #18181B;
-  --zen-bg-card-alt: #242427;
-  --zen-bg-subtle: #2E2E33;
+  --zen-bg: #121214;
+  --zen-bg-card: #1C1C20;
+  --zen-bg-card-alt: #26262C;
+  --zen-bg-subtle: #303038;
   
-  --zen-text-main: #FAFAFA;
-  --zen-text-muted: #A1A1AA;
-  --zen-text-light: #71717A;
+  --zen-text-main: #FFFFFF;
+  --zen-text-muted: #A8A8B5;
+  --zen-text-light: #7E7E8C;
   
-  /* Primary Accent: Vibrant & Warm Orange */
-  --zen-forest-dark: #FB923C;
+  /* Primary Warm Accent: Golden Warm Amber & Glow */
+  --zen-forest-dark: #FF9E43;
   --zen-forest-medium: #F97316;
-  --zen-forest-light: #2A170B;
+  --zen-forest-light: #2D1A0E;
   
   --zen-amber: #F97316;
-  --zen-amber-light: #361A08;
+  --zen-amber-light: #2D1A0E;
   
-  --zen-sage-light: #26262B;
-  --zen-border: #3F3F46;
-  --zen-border-subtle: #27272A;
+  --zen-sage-light: #282830;
+  --zen-border: #3A3A44;
+  --zen-border-subtle: #292930;
 
-  /* Status Colors */
-  --status-pending-bg: #451A03;
-  --status-pending-text: #FDBA74;
+  /* Status Colors - Vibrant contrast against dark background */
+  --status-pending-bg: #451D08;
+  --status-pending-text: #FFC785;
   
-  --status-approved-bg: #1A2E1E;
-  --status-approved-text: #4ADE80;
+  --status-approved-bg: #0B3C2A;
+  --status-approved-text: #6EE7B7;
   
-  --status-rejected-bg: #451212;
+  --status-rejected-bg: #481717;
   --status-rejected-text: #FCA5A5;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background-color: var(--zen-bg-card-alt) !important;
+  color: #FFFFFF !important;
+  border-color: var(--zen-border) !important;
+}
+
+body.dark-mode select option {
+  background-color: #1C1C20 !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-mode .zen-card-hero {
+  background: linear-gradient(135deg, #241409 0%, #3B1F0B 100%);
+  border: 1.5px solid rgba(249, 115, 22, 0.4);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .zen-card {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border-color: var(--zen-border);
 }
 
 body {

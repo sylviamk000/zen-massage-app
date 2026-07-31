@@ -47,10 +47,10 @@ export const HistoryView: React.FC = () => {
           {filteredHistory.map(log => (
             <div key={log.id} className="zen-card" style={{ padding: '1rem', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
               <div style={{ 
-                background: log.type === 'renewal' ? 'var(--zen-accent-light)' : 'var(--zen-bg)', 
+                background: log.type === 'renewal' ? 'var(--status-approved-bg)' : 'var(--zen-amber-light)', 
                 padding: '10px', 
                 borderRadius: '50%',
-                color: 'var(--zen-accent)'
+                color: log.type === 'renewal' ? 'var(--status-approved-text)' : 'var(--zen-amber)'
               }}>
                 {log.type === 'renewal' ? <RefreshCw size={20} /> : <Clock size={20} />}
               </div>
@@ -60,7 +60,7 @@ export const HistoryView: React.FC = () => {
                     {log.type === 'renewal' ? 'Renovación Diaria' : 'Sesión de Masaje'}
                   </p>
                   {log.type === 'session' && (
-                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--zen-accent)', background: 'var(--zen-accent-light)', padding: '2px 6px', borderRadius: '4px' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--zen-amber)', background: 'var(--zen-amber-light)', padding: '2px 8px', borderRadius: '10px' }}>
                       {Math.floor(log.durationConsumed / 60)} min
                     </span>
                   )}
