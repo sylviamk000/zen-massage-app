@@ -252,27 +252,31 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           rating: r.rating
         }));
 
-        // Notifications logic when status changes
-        if (!initialLoadRef.current) {
-          mapped.forEach(req => {
-            const oldStatus = statusMapRef.current[req.id];
-            
+        // Notifications logic when status changes (persistent across app locks and restarts)
+        mapped.forEach(req => {
+          const notifKey = `zen_notified_${req.id}_${req.status}`;
+          const alreadyNotified = localStorage.getItem(notifKey) === 'true';
+
+          if (!alreadyNotified && currentUser) {
             // Notification for Gnomo: New request created
-            if (!oldStatus && req.status === 'pendiente' && currentUser?.role === 'masajista') {
+            if (req.status === 'pendiente' && currentUser.role === 'masajista') {
               sendSystemNotification('🐻 ¡Nueva Petición de Masaje!', `Mataosos te ha solicitado un masaje de ${req.minutes} min.`);
+              localStorage.setItem(notifKey, 'true');
             }
 
             // Notification for Mataosos: Gnomo approved request
-            if (oldStatus && oldStatus !== 'aprobada' && req.status === 'aprobada' && currentUser?.role === 'cliente') {
+            if (req.status === 'aprobada' && currentUser.role === 'cliente') {
               sendSystemNotification('🍄 ¡Masaje Aprobado por Gnomo!', `Gnomo ha aceptado tu petición de ${req.minutes} min. ¡Puedes comenzar!`);
+              localStorage.setItem(notifKey, 'true');
             }
 
             // Notification for Mataosos: Gnomo rejected request
-            if (oldStatus && oldStatus !== 'rechazada' && req.status === 'rechazada' && currentUser?.role === 'cliente') {
+            if (req.status === 'rechazada' && currentUser.role === 'cliente') {
               sendSystemNotification('🍄 Masaje Rechazado', `Gnomo ha rechazado la petición: "${req.reject_reason || 'Ahora no puedo'}"`);
+              localStorage.setItem(notifKey, 'true');
             }
-          });
-        }
+          }
+        });
 
         // Update status map
         const newMap: { [key: string]: string } = {};
@@ -525,6 +529,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const recordSession = (reqId: string, durationRequested: number, durationConsumed: number, rating?: number) => {
     const todayStr = getLocalDateString();
+    const actualMin = Math.max(1, Math.ceil(durationConsumed / 60));
+
     const newLog: SessionLog = {
       id: Date.now().toString(),
       date: todayStr,
@@ -553,7 +559,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       return updated;
     });
 
-    setRequests(prev => prev.map(req => req.id === reqId ? { ...req, status: 'completada', actual_minutes: Math.floor(durationConsumed/60), rating } : req));
+    setRequests(prev => prev.map(req => req.id === reqId ? { ...req, status: 'completada', actual_minutes: actualMin, rating } : req));
+
+    // Update Supabase request record with status='completada' and actual_minutes
+    supabase.from('requests').update({
+      status: 'completada',
+      actual_minutes: actualMin,
+      rating: rating || null
+    }).eq('id', reqId).then(({ error }) => {
+      if (error) console.warn('Supabase update completed request error:', error.message);
+    });
   };
 
   const resetApp = async () => {
@@ -589,7 +604,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const [updateBannerMessage, setUpdateBannerMessage] = useState<string | null>(() => {
-    if (typeof window !== 'undefined' && sessionStorage.getItem('zen_banner_dismissed') !== 'true') {
+    if (typeof window !== 'undefined' && localStorage.getItem(`zen_banner_dismissed_v${APP_VERSION}`) !== 'true') {
       return `Novedad v${APP_VERSION}! ${APP_UPDATE_NOTES}`;
     }
     return null;
@@ -608,13 +623,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       localStorage.setItem('zen_app_version', APP_VERSION);
     }
 
-    if (sessionStorage.getItem('zen_banner_dismissed') !== 'true') {
-      setUpdateBannerMessage(`Novedad v${APP_VERSION}! ${APP_UPDATE_NOTES}`);
+    if (localStorage.getItem(`zen_banner_dismissed_v${APP_VERSION}`) === 'true') {
+      setUpdateBannerMessage(null);
     }
   }, [currentUser]);
 
   const dismissUpdateBanner = () => {
-    sessionStorage.setItem('zen_banner_dismissed', 'true');
+    localStorage.setItem(`zen_banner_dismissed_v${APP_VERSION}`, 'true');
     setUpdateBannerMessage(null);
   };
 

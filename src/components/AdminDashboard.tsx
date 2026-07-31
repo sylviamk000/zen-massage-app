@@ -83,6 +83,14 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  const formatTimeSent = (timestamp?: number) => {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `Enviada a las ${hours}:${minutes} hs`;
+  };
+
   return (
     <div className="fade-in" style={{ padding: '0 1.25rem 2rem 1.25rem', maxWidth: '580px', margin: '0 auto', position: 'relative' }}>
       
@@ -324,12 +332,18 @@ export const AdminDashboard: React.FC = () => {
                       </span>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: req.note ? '8px' : '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
                       <span style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-serif)', color: 'var(--zen-forest-dark)' }}>
                         {req.minutes}
                       </span>
                       <span style={{ fontSize: '0.95rem', color: 'var(--zen-text-muted)', fontWeight: 500 }}>minutos solicitados</span>
                     </div>
+
+                    {req.created_at && (
+                      <div style={{ fontSize: '0.8rem', color: '#D97724', fontWeight: 600, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Clock size={13} /> {formatTimeSent(req.created_at)}
+                      </div>
+                    )}
 
                     {req.note && (
                       <p style={{ 

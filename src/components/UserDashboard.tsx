@@ -38,24 +38,45 @@ export const UserDashboard: React.FC = () => {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
+  const [sessionFinishData, setSessionFinishData] = useState<{ reqId: string; requestedSeconds: number; consumedSeconds: number } | null>(null);
+
+  const formatTimeSent = (timestamp?: number) => {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `Enviada a las ${hours}:${minutes} hs`;
+  };
+
   const handleStartSession = () => {
     if (currentRequest) {
       updateRequestStatus(currentRequest.id, 'en_curso');
     }
   };
 
-  const handleTimerFinish = (reqId: string, _requestedSeconds: number, _consumedSeconds: number) => {
+  const handleTimerFinish = (reqId: string, requestedSeconds: number, consumedSeconds: number) => {
+    setSessionFinishData({ reqId, requestedSeconds, consumedSeconds });
     updateRequestStatus(reqId, 'completada', { rating: 5 });
     setShowRatingScreen(reqId);
   };
 
   const submitRating = () => {
     if (showRatingScreen) {
-      const req = requests.find(r => r.id === showRatingScreen);
-      if (req) {
-        recordSession(req.id, req.minutes * 60, req.actual_minutes ? req.actual_minutes * 60 : req.minutes * 60, rating);
+      if (sessionFinishData && sessionFinishData.reqId === showRatingScreen) {
+        recordSession(
+          sessionFinishData.reqId, 
+          sessionFinishData.requestedSeconds, 
+          sessionFinishData.consumedSeconds, 
+          rating
+        );
+      } else {
+        const req = requests.find(r => r.id === showRatingScreen);
+        if (req) {
+          recordSession(req.id, req.minutes * 60, req.actual_minutes ? req.actual_minutes * 60 : req.minutes * 60, rating);
+        }
       }
       setShowRatingScreen(null);
+      setSessionFinishData(null);
     }
   };
 
@@ -226,12 +247,18 @@ export const UserDashboard: React.FC = () => {
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: currentRequest.note ? '8px' : '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '4px' }}>
             <span style={{ fontSize: '2rem', fontWeight: 700, fontFamily: 'var(--font-serif)', color: 'var(--zen-forest-dark)' }}>
               {currentRequest.minutes}
             </span>
             <span style={{ fontSize: '1rem', color: 'var(--zen-text-muted)', fontWeight: 500 }}>minutos de masaje</span>
           </div>
+
+          {currentRequest.created_at && (
+            <div style={{ fontSize: '0.8rem', color: 'var(--zen-amber)', fontWeight: 600, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Clock size={13} /> {formatTimeSent(currentRequest.created_at)}
+            </div>
+          )}
 
           {currentRequest.note && (
             <p style={{ margin: '0 0 16px 0', fontSize: '0.9rem', color: 'var(--zen-text-muted)', fontStyle: 'italic', background: 'var(--zen-bg-subtle)', padding: '10px 14px', borderRadius: '12px' }}>
